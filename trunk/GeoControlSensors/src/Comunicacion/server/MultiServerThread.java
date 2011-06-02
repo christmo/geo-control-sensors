@@ -2,15 +2,19 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package Comunicacion;
+package comunicacion.server;
 
+import BaseDatos.BaseDatos;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import monitoreo.sensores.Monitoreo;
+import monitoreo.sensores.Sensor;
 
 /**
  *
@@ -19,10 +23,12 @@ import java.util.logging.Logger;
 class MultiServerThread extends Thread {
 
     private Socket socket = null;
+    private BaseDatos bd;
 
-    public MultiServerThread(Socket socket) {
+    public MultiServerThread(Socket socket, BaseDatos bd) {
         super("MultiServerThread");
         this.socket = socket;
+        this.bd = bd;
         System.out.println("Conectado:["
                 + socket.getInetAddress().getHostAddress()
                 + "]["
@@ -41,22 +47,13 @@ class MultiServerThread extends Thread {
 
             String inputLine;
 
-            //String outputLine = "hola";
-            //out.println(outputLine);
-
             while ((inputLine = in.readLine()) != null) {
-                System.out.println("ENTRA:" + inputLine);
-                //outputLine = inputLine;
-                //out.println(outputLine);
-                //if (outputLine.equals("Bye")) {
-                //    break;
-                //}
+                //System.out.println("ENTRA:" + inputLine);
                 procesarTrama(inputLine);
             }
             out.close();
             in.close();
         } catch (IOException ex) {
-            //System.out.println(""+ex.getMessage());
             if (!ex.getMessage().equals("socket closed")) {
                 Logger.getLogger(MultiServerThread.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -72,12 +69,17 @@ class MultiServerThread extends Thread {
         //M01%T1*14.173%T2*27.370%T3*14.173%T4*26.392##
         String[] lecturas = inputLine.split("%");
         String modulo = lecturas[0];
-        System.out.println("Mod:" + modulo);
+        ArrayList<Sensor> listaParMaxMinModulo = bd.getListaParametrosMaxMinModulo(modulo);
         String[] parametros;
         for (int i = 1; i < lecturas.length; i++) {
             try {
                 parametros = lecturas[i].split("&");
-                System.out.println(modulo + parametros[0] + " T:" + parametros[1]);
+                bd.insertarDatosSensor(modulo + parametros[0], parametros[1]);
+                Monitoreo m = new Monitoreo(modulo,
+                        modulo + parametros[0],
+                        parametros[1],
+                        listaParMaxMinModulo, bd);
+                m.start();
             } catch (ArrayIndexOutOfBoundsException ex) {
                 System.out.println("Trama no valida...");
             }

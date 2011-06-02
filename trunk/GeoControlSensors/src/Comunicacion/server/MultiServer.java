@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package Comunicacion;
+package comunicacion.server;
 
+import BaseDatos.BaseDatos;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
@@ -16,19 +17,19 @@ public class MultiServer {
 
     private ServerSocket serverSocket = null;
     private boolean listening = true;
-    ArrayList<MultiServerThread> listaConexiones = new ArrayList<MultiServerThread>();
+    private ArrayList<MultiServerThread> listaConexiones = new ArrayList<MultiServerThread>();
+    private BaseDatos bd;
 
-    public MultiServer(int puerto) throws IOException {
-
+    public MultiServer(int puerto, BaseDatos bd) throws IOException {
+        this.bd = bd;
         serverSocket = new ServerSocket(puerto);
-
         System.out.println("Servidor Iniciado [" + puerto + "]");
 
     }
 
     public void escucharConexiones() throws IOException {
         while (listening) {
-            MultiServerThread con = new MultiServerThread(serverSocket.accept());
+            MultiServerThread con = new MultiServerThread(serverSocket.accept(),bd);
             con.start();
             listaConexiones.add(con);
         }
