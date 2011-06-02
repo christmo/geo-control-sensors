@@ -10,10 +10,14 @@
  */
 package PrincipalGUI;
 
-import Comunicacion.MultiServer;
+import BaseDatos.BaseDatos;
+import comunicacion.server.MultiServer;
+import Utilitarios.Utilitarios;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -26,6 +30,8 @@ import javax.swing.JOptionPane;
 public class GUI_Server extends javax.swing.JFrame {
 
     private MultiServer servidor;
+    public static Properties arcConfig;
+    private BaseDatos bd;
 
     /** Creates new form GUI_Server */
     public GUI_Server() {
@@ -38,7 +44,16 @@ public class GUI_Server extends javax.swing.JFrame {
                 pararServidorConexiones(true);
             }
         });
-
+        try {
+            arcConfig = Utilitarios.obtenerArchivoPropiedades("configuracion.properties");
+            bd = new BaseDatos(arcConfig);
+        } catch (FileNotFoundException ex) {
+            //Logger.getLogger(GUI_Server.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null,
+                    "No se encontró el archivo de configuración...",
+                    "Error...", 0);
+            System.exit(0);
+        }
     }
 
     /** This method is called from within the constructor to
@@ -53,6 +68,7 @@ public class GUI_Server extends javax.swing.JFrame {
         btnIniciar = new javax.swing.JToggleButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        setTitle("Geo Control Sensors");
         setResizable(false);
 
         btnIniciar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/velocidad.png"))); // NOI18N
@@ -91,7 +107,7 @@ public class GUI_Server extends javax.swing.JFrame {
 
                 public void run() {
                     try {
-                        servidor = new MultiServer(444);
+                        servidor = new MultiServer(444, bd);
                         servidor.escucharConexiones();
                     } catch (IOException ex) {
                         //Logger.getLogger(GUI_Server.class.getName()).log(Level.SEVERE, null, ex);
@@ -138,25 +154,37 @@ public class GUI_Server extends javax.swing.JFrame {
      * @param salir
      */
     private void pararServidorConexiones(boolean salir) {
-        int op = JOptionPane.showConfirmDialog(null,
-                "Esta seguro que quiere detener el monitor de sensores...",
-                "Alerta...",
-                2,
-                JOptionPane.YES_NO_OPTION);
-        if (op == 0) {
-            //si es true significa que pulso la x hay que salir
-            if (salir) {
-                //System.out.println("Salir");
-                System.exit(0);
+        if (salir && !btnIniciar.isSelected()) {
+            try {
+                bd.CerrarConexion();
+            } catch (NullPointerException ex) {
             }
-            cerrarConexiones();
+            System.exit(0);
         } else {
-            //salir es false significa que se dio clic en el boton
-            //si es true es la x de la ventana
-            if (salir) {
-                btnIniciar.setSelected(btnIniciar.isSelected());
+            int op = JOptionPane.showConfirmDialog(null,
+                    "Esta seguro que quiere detener el monitor de sensores...",
+                    "Alerta...",
+                    2,
+                    JOptionPane.YES_NO_OPTION);
+            if (op == 0) {
+                //si es true significa que pulso la x hay que salir
+                if (salir) {
+                    //System.out.println("Salir");
+                    try {
+                        bd.CerrarConexion();
+                    } catch (NullPointerException ex) {
+                    }
+                    System.exit(0);
+                }
+                cerrarConexiones();
             } else {
-                btnIniciar.setSelected(true);
+                //salir es false significa que se dio clic en el boton
+                //si es true es la x de la ventana
+                if (salir) {
+                    btnIniciar.setSelected(btnIniciar.isSelected());
+                } else {
+                    btnIniciar.setSelected(true);
+                }
             }
         }
     }

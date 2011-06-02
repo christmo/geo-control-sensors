@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+    <timestamp key="fecha" datePattern="yyyy-MM-dd"/>
+
+    <jmxConfigurator contextName="KRADAC" />
+    
+    <!-- Se puede establecer el directorio "a mano" o usar el del usuario  -->
+    <property name="appName" value="kradac" />
+    <property name="logPath" value="c:\\KradacLogs" />
+
+    <!-- Trace para Seguir los movimientos de la base de datos-->
+    <appender name="TRACE_BD" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>TRACE</level>
+        </filter>
+
+        <File>${logPath}/${fecha}/${appName}-BD.log</File>
+
+        <!-- full stacktrace para las excepciones -->
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                [%p][%d{dd/MM/yyyy HH:mm:ss}][%F][linea %L] %msg%n[excepciones] %exception{full}%n{2}
+            </Pattern>
+        </layout>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${logPath}/%d{yyyy-MM-dd}/${appName}-BD.log</FileNamePattern>
+            <!-- mantener 5 días de historia -->
+            <MaxHistory>5</MaxHistory>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>5MB</maxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <appender name="TRACE_PRINCIPAL" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>TRACE</level>
+        </filter>
+
+        <File>${logPath}/${fecha}/${appName}-GUI.log</File>
+
+        <!-- full stacktrace para las excepciones -->
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                [%p][%d{dd/MM/yyyy HH:mm:ss}][%F][linea %L] %msg%n[excepciones] %exception{full}%n{2}
+            </Pattern>
+        </layout>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${logPath}/%d{yyyy-MM-dd}/${appName}-GUI.log</FileNamePattern>
+            <!-- mantener 5 días de historia -->
+            <MaxHistory>5</MaxHistory>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>5MB</maxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <appender name="TRACE_SERVIDOR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>TRACE</level>
+        </filter>
+
+        <File>${logPath}/${fecha}/${appName}-SERVER.log</File>
+
+        <!-- full stacktrace para las excepciones -->
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                [%p][%d{dd/MM/yyyy HH:mm:ss}][%F][linea %L] %msg%n[excepciones] %exception{full}%n{2}
+            </Pattern>
+        </layout>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${logPath}/%d{yyyy-MM-dd}/${appName}-SERVER.log</FileNamePattern>
+            <!-- mantener 5 días de historia -->
+            <MaxHistory>5</MaxHistory>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>5MB</maxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <appender name="pantalla" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                [%p][%d{dd/MM/yyyy HH:mm:ss}][%F][linea %L] %msg%n{3}
+            </Pattern>
+        </layout>
+    </appender>
+
+    <!--
+     Enviar mail cuando se produsca un error
+    -->
+    <appender name="EMAIL" class="ch.qos.logback.classic.net.SMTPAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <SMTPHost>smtp.gmail.com</SMTPHost>
+        <SMTPPort>465</SMTPPort>
+        <SSL>true</SSL>
+        <Username>soporte@kradac.com</Username>
+        <Password>superkradacalrescate</Password>
+
+        <To>soporte@kradac.com</To>
+        <From>soporte@kradac.com</From>
+        <Subject>Logs: %logger{20} - %m</Subject>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                [%p][%d{dd/MM/yyyy HH:mm:ss}][%F][linea %L] %msg%n[excepciones] %exception{full}%n{2}
+            </Pattern>
+        </layout>
+    </appender>
+
+    <logger name="BaseDatos.BaseDatos" level="TRACE">
+        <appender-ref ref="TRACE_BD"/>
+        <appender-ref ref="EMAIL"/>
+        <appender-ref ref="pantalla"/>
+    </logger>
+
+    <logger name="PrincipalGUI" level="ALL">
+        <appender-ref ref="EMAIL"/>
+        <appender-ref ref="TRACE_PRINCIPAL"/>
+        <appender-ref ref="pantalla"/>
+    </logger>
+
+    <logger name="Comunicacion" level="ALL">
+        <appender-ref ref="EMAIL"/>
+        <appender-ref ref="TRACE_SERVIDOR"/>
+        <appender-ref ref="pantalla"/>
+    </logger>
+
+
+</configuration>

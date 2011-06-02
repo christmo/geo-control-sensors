@@ -182,17 +182,15 @@ public class Utilitarios {
      * todo el proyecto.
      * @return String
      */
-    public static String getFechaAAMMdd() {
+    public static String getFechaAAAAMMdd() {
         Calendar c = new GregorianCalendar();
-        SimpleDateFormat sdf = new SimpleDateFormat("yy/MM/dd");
-        System.out.println("f:" + sdf.format(c.getTime()));
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
         return sdf.format(c.getTime());
     }
 
     public static String getHora() {
         Calendar c = new GregorianCalendar();
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-        System.out.println("H:" + sdf.format(c.getTime()));
         return sdf.format(c.getTime());
     }
 
