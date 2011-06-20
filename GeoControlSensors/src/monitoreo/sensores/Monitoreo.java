@@ -18,6 +18,8 @@ public class Monitoreo extends Thread {
     private String modulo;
     private String id_sen;
     private double param_sen;
+    private String fecha;
+    private String hora;
     private BaseDatos bd;
     ArrayList<Sensor> listaParMaxMinModulo = new ArrayList<Sensor>();
 
@@ -32,21 +34,31 @@ public class Monitoreo extends Thread {
     public Monitoreo(String modulo,
             String id_sen,
             String param_sen,
+            String fecha,
+            String hora,
             ArrayList<Sensor> listaParMaxMinModulo,
             BaseDatos bd) {
         this.modulo = modulo;
         this.id_sen = id_sen;
         this.param_sen = Double.parseDouble(param_sen);
+        this.fecha = fecha;
+        this.hora = hora;
         this.listaParMaxMinModulo = listaParMaxMinModulo;
         this.bd = bd;
     }
 
     @Override
     public void run() {
+        boolean r = false;
+        double a, b;
         for (Sensor s : listaParMaxMinModulo) {
             if (s.getId_sen().equals(id_sen)) {
-                if (param_sen < s.getParam_min() || param_sen > s.getParam_max()
-                        && bd.esTiempoNuevaAlerta(id_sen)) {
+                r = bd.esTiempoNuevaAlerta(id_sen);
+                a = s.getParam_min();
+                b = s.getParam_max();
+                System.out.println(r + " " + a + " " + param_sen + " " + b + " " + id_sen + " " + Utilitarios.getHora());
+                if ((param_sen < a || param_sen > b) && r) {
+                    System.err.println("Enviar: " + id_sen + " " + param_sen + " " + r + " " + Utilitarios.getHora());
                     lanzarAlerta(s.getParam_min(), s.getParam_max(), s.getTipoSensor());
                 }
                 break;
@@ -60,10 +72,12 @@ public class Monitoreo extends Thread {
      * @param param_max
      * @param tipoSensor
      */
-    private void lanzarAlerta(double param_min, double param_max, String tipoSensor) {
+    private synchronized void lanzarAlerta(double param_min, double param_max, String tipoSensor) {
         ArrayList<Contactos> listaContactos = bd.getListaContactosReportar(id_sen);
         int id_dato = 0;
         for (Contactos contacto : listaContactos) {
+            id_dato = bd.getIDDatoInsertado(id_sen, hora, param_sen);
+            bd.insertarNotificacion(contacto.getId_con(), id_dato);
             AlertaMail alerta = new AlertaMail(
                     id_sen,
                     modulo,
@@ -74,8 +88,6 @@ public class Monitoreo extends Thread {
                     contacto.getStrMail(),
                     contacto.getStrNombre());
             alerta.start();
-            id_dato = bd.getIDDatoInsertado(id_sen,Utilitarios.getHora(),param_sen);
-            bd.insertarNotificacion(contacto.getId_con(),id_dato);
         }
     }
 }

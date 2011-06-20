@@ -179,12 +179,23 @@ public class Utilitarios {
 
     /**
      * Obtiene la fecha actual del equipo, este metodo se puede consumir desde
-     * todo el proyecto.
+     * todo el proyecto. Los campos son separados por un slash (/)
      * @return String
      */
-    public static String getFechaAAAAMMdd() {
+    public static String getFechaAAAAMMddSlash() {
         Calendar c = new GregorianCalendar();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+        return sdf.format(c.getTime());
+    }
+
+    /**
+     * Obtiene la fecha actual del equipo, este metodo se puede consumir desde
+     * todo el proyecto. Los campos son separados por un guion (-)
+     * @return String
+     */
+    public static String getFechaAAAAMMddGuion() {
+        Calendar c = new GregorianCalendar();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         return sdf.format(c.getTime());
     }
 
