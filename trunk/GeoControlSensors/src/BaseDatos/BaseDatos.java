@@ -159,7 +159,11 @@ public class BaseDatos {
             rsCUD.next();
         } catch (SQLException ex) {
             int intCode = ex.getErrorCode();
-            log.trace("Error al consultar codigo[" + intCode + "]", ex);
+            if (intCode == 0) {
+                log.trace("Error de comunicación con la BD, mucho tiempo esperando respuesta...");
+            } else {
+                log.trace("Error al consultar codigo[" + intCode + "]", ex);
+            }
         }
         return rsCUD;
     }
@@ -212,9 +216,9 @@ public class BaseDatos {
      * @param parametro
      * @return boolean true si inserta correctamente
      */
-    public boolean insertarDatosSensor(String id_sen, String parametro) {
-        String sql = "INSERT INTO DATOS(ID_SEN,PARAMETRO_DAT) "
-                + "VALUES('" + id_sen + "'," + parametro + ")";
+    public boolean insertarDatosSensor(String id_sen, double parametro, String fecha, String hora) {
+        String sql = "INSERT INTO DATOS(ID_SEN,PARAMETRO_DAT,FECHA_DAT,HORA_DAT) "
+                + "VALUES('" + id_sen + "'," + parametro + ",'" + fecha + "','" + hora + "')";
         return ejecutarSentencia(sql);
     }
 
@@ -238,6 +242,7 @@ public class BaseDatos {
             }
         } catch (SQLException ex) {
             java.util.logging.Logger.getLogger(BaseDatos.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NullPointerException ex) {
         }
         return lista;
     }
@@ -279,6 +284,7 @@ public class BaseDatos {
             return r.getInt(1);
         } catch (SQLException ex) {
             java.util.logging.Logger.getLogger(BaseDatos.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NullPointerException ex) {
         }
         return 0;
     }
@@ -300,12 +306,15 @@ public class BaseDatos {
      * @return boolean true si hay que enviar alerta
      */
     public boolean esTiempoNuevaAlerta(String id_sen) {
-        String sql = "SELECT SF_ENVIAR_ALERTA('"+id_sen+"')";
+        String sql = "SELECT SF_ENVIAR_ALERTA('" + id_sen + "')";
         ResultSet rs = ejecutarConsultaUnDato(sql);
+
         try {
             return rs.getBoolean(1);
         } catch (SQLException ex) {
             //java.util.logging.Logger.getLogger(BaseDatos.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        } catch (NullPointerException ex) {
             return false;
         }
     }

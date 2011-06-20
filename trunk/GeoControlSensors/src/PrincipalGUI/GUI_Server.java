@@ -11,7 +11,7 @@
 package PrincipalGUI;
 
 import BaseDatos.BaseDatos;
-import comunicacion.server.MultiServer;
+import Comunicacion.server.MultiServer;
 import Utilitarios.Utilitarios;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;

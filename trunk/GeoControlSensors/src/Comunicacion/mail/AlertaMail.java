@@ -54,7 +54,7 @@ public class AlertaMail extends Thread {
                 append("</b> ] y MAX[ <b>").
                 append(parMax).
                 append("</b> ]");
-        mensaje.append("<br/><br/>Fecha: ").append(Utilitarios.getFechaAAAAMMdd());
+        mensaje.append("<br/><br/>Fecha: ").append(Utilitarios.getFechaAAAAMMddSlash());
         mensaje.append("<br/>Hora: ").append(Utilitarios.getHora());
         mensaje.append("<br/><br/>-------------<br/>KRADAC<br/>");
     }

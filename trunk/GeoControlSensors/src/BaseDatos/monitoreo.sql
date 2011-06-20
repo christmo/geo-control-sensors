@@ -15,6 +15,8 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
+create database monitorsensores;
+use monitorsensores;
 --
 -- Table structure for table `configuracion`
 --
@@ -73,11 +75,16 @@ PARTITIONS 365 */;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = '' */ ;
 DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER TGR_DATOS_SENSOR BEFORE INSERT ON DATOS
-FOR EACH ROW BEGIN
-    SET NEW.HORA_DAT = CURTIME();
-    SET NEW.FECHA_DAT = CURDATE();
-    SET NEW.ID_DAT_PAR = DATE_FORMAT(CURDATE(),'%Y%m%d');
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER TGR_DATOS_SENSOR BEFORE INSERT ON DATOS
+
+FOR EACH ROW BEGIN
+
+    SET NEW.HORA_DAT = CURTIME();
+
+    SET NEW.FECHA_DAT = CURDATE();
+
+    SET NEW.ID_DAT_PAR = DATE_FORMAT(CURDATE(),'%Y%m%d');
+
 END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -170,44 +177,80 @@ CREATE TABLE `usuarios` (
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = '' */ ;
 DELIMITER ;;
-/*!50003 CREATE*/ /*!50020 DEFINER=`root`@`localhost`*/ /*!50003 FUNCTION `SF_ENVIAR_ALERTA`(
-  id VARCHAR(10)
+/*!50003 CREATE*/ /*!50020 DEFINER=`root`@`localhost`*/ /*!50003 FUNCTION `SF_ENVIAR_ALERTA`(
+
+  id VARCHAR(10)
+
 ) RETURNS tinyint(1)
     DETERMINISTIC
-BEGIN
-
-DECLARE resul BOOLEAN;
-DECLARE NO_HAY_DATO CONDITION FOR 1329;
-
-DECLARE CONTINUE HANDLER FOR NO_HAY_DATO
-BEGIN
-  DECLARE dato int(5);
-  SELECT COUNT(*)
-  INTO dato
-  FROM notificaciones n, datos d
-  WHERE n.id_dat_inc = d.id_dat_inc and d.id_sen = id;
-
-  if dato > 0 then
-    /*Significa ya estan ingresado y que no debe insrtar*/
-    return 0;
-  else
-    /*Significa que aun no esta ingresado un dato y que debe insertar*/
-    return 1;
-  end if;
-END;
-
-
-
-SELECT NOW()>=MAX(concat(n.fecha_not,' ',n.hora_not))+ INTERVAL SF_GET_CONFIG('tiempo') MINUTE AS notif
-INTO resul
-FROM notificaciones n, datos d
-where n.id_dat_inc = d.id_dat_inc
-AND d.id_sen = id
-group by d.id_sen
-HAVING notif = 1;
-
-RETURN resul;
-
+BEGIN
+
+
+
+DECLARE resul BOOLEAN;
+
+DECLARE NO_HAY_DATO CONDITION FOR 1329;
+
+
+
+DECLARE CONTINUE HANDLER FOR NO_HAY_DATO
+
+BEGIN
+
+  DECLARE dato int(5);
+
+  SELECT COUNT(*)
+
+  INTO dato
+
+  FROM notificaciones n, datos d
+
+  WHERE n.id_dat_inc = d.id_dat_inc and d.id_sen = id;
+
+
+
+  if dato > 0 then
+
+    /*Significa ya estan ingresado y que no debe insrtar*/
+
+    return 0;
+
+  else
+
+    /*Significa que aun no esta ingresado un dato y que debe insertar*/
+
+    return 1;
+
+  end if;
+
+END;
+
+
+
+
+
+
+
+SELECT NOW()>=MAX(concat(n.fecha_not,' ',n.hora_not))+ INTERVAL SF_GET_CONFIG('tiempo') MINUTE AS notif
+
+INTO resul
+
+FROM notificaciones n, datos d
+
+where n.id_dat_inc = d.id_dat_inc
+
+AND d.id_sen = id
+
+group by d.id_sen
+
+HAVING notif = 1;
+
+
+
+RETURN resul;
+
+
+
 END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -224,21 +267,34 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = '' */ ;
 DELIMITER ;;
-/*!50003 CREATE*/ /*!50020 DEFINER=`root`@`localhost`*/ /*!50003 FUNCTION `SF_GET_CONFIG`(
-  nomb VARCHAR(10)
+/*!50003 CREATE*/ /*!50020 DEFINER=`root`@`localhost`*/ /*!50003 FUNCTION `SF_GET_CONFIG`(
+
+  nomb VARCHAR(10)
+
 ) RETURNS varchar(100) CHARSET latin1
     DETERMINISTIC
-BEGIN
-
-DECLARE resul VARCHAR(100);
-
-SELECT valor
-INTO resul
-FROM configuracion
-where nombre = nomb;
-
-RETURN resul;
-
+BEGIN
+
+
+
+DECLARE resul VARCHAR(100);
+
+
+
+SELECT valor
+
+INTO resul
+
+FROM configuracion
+
+where nombre = nomb;
+
+
+
+RETURN resul;
+
+
+
 END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -255,23 +311,38 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = '' */ ;
 DELIMITER ;;
-/*!50003 CREATE*/ /*!50020 DEFINER=`root`@`localhost`*/ /*!50003 FUNCTION `SF_OBTENER_ID_DATO`(
-  idsen VARCHAR(10),
-  hora TIME,
-  par DOUBLE
+/*!50003 CREATE*/ /*!50020 DEFINER=`root`@`localhost`*/ /*!50003 FUNCTION `SF_OBTENER_ID_DATO`(
+
+  idsen VARCHAR(10),
+
+  hora TIME,
+
+  par DOUBLE
+
 ) RETURNS int(11)
     DETERMINISTIC
-BEGIN
-
-  DECLARE id int(11);
-
-  SELECT ID_DAT_INC
-	INTO id
-	FROM DATOS
-  WHERE ID_SEN = idsen AND FECHA_DAT = CURDATE() AND HORA_DAT = hora AND PARAMETRO_DAT = par;
-
-  RETURN id;
-
+BEGIN
+
+
+
+  DECLARE id int(11);
+
+
+
+  SELECT ID_DAT_INC
+
+	INTO id
+
+	FROM DATOS
+
+  WHERE ID_SEN = idsen AND FECHA_DAT = CURDATE() AND HORA_DAT = hora AND PARAMETRO_DAT = par;
+
+
+
+  RETURN id;
+
+
+
 END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -288,15 +359,23 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = '' */ ;
 DELIMITER ;;
-/*!50003 CREATE*/ /*!50020 DEFINER=`root`@`localhost`*/ /*!50003 PROCEDURE `SP_INSERTAR_NOTIFICACION`(
-  CON INT(11),
-  DAT INT(11)
+/*!50003 CREATE*/ /*!50020 DEFINER=`root`@`localhost`*/ /*!50003 PROCEDURE `SP_INSERTAR_NOTIFICACION`(
+
+  CON INT(11),
+
+  DAT INT(11)
+
 )
-BEGIN
-
-  INSERT INTO NOTIFICACIONES(ID_CON,FECHA_NOT,HORA_NOT,ID_DAT_INC)
-  VALUES (CON,CURDATE(),CURTIME(),DAT);
-
+BEGIN
+
+
+
+  INSERT INTO NOTIFICACIONES(ID_CON,FECHA_NOT,HORA_NOT,ID_DAT_INC)
+
+  VALUES (CON,CURDATE(),CURTIME(),DAT);
+
+
+
 END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;

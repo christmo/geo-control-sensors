@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package comunicacion.server;
+package Comunicacion.server;
 
 import BaseDatos.BaseDatos;
 import java.io.IOException;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Usuario
+ * @author kradac
  */
 public class MultiServer {
 
@@ -29,7 +29,7 @@ public class MultiServer {
 
     public void escucharConexiones() throws IOException {
         while (listening) {
-            MultiServerThread con = new MultiServerThread(serverSocket.accept(),bd);
+            MultiServerThread con = new MultiServerThread(serverSocket.accept(), bd);
             con.start();
             listaConexiones.add(con);
         }
@@ -41,23 +41,5 @@ public class MultiServer {
             multiServerThread.cerrarConexion();
         }
         serverSocket.close();
-    }
-
-    public static void main(String[] args) throws IOException {
-//        ServerSocket serverSocket = null;
-//        boolean listening = true;
-//
-//        try {
-//            serverSocket = new ServerSocket(1024);
-//        } catch (IOException e) {
-//            System.err.println("No se puede escuchar el puerto 1024");
-//            System.exit(-1);
-//        }
-//
-//        while (listening) {
-//            new MultiServerThread(serverSocket.accept()).start();
-//        }
-//
-//        serverSocket.close();
     }
 }

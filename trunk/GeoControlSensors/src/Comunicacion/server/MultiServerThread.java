@@ -2,9 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package comunicacion.server;
+package Comunicacion.server;
 
 import BaseDatos.BaseDatos;
+import Utilitarios.Utilitarios;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -18,7 +19,7 @@ import monitoreo.sensores.Sensor;
 
 /**
  *
- * @author Usuario
+ * @author kradac
  */
 class MultiServerThread extends Thread {
 
@@ -54,7 +55,7 @@ class MultiServerThread extends Thread {
             out.close();
             in.close();
         } catch (IOException ex) {
-            if (!ex.getMessage().equals("socket closed")) {
+            if (!ex.getMessage().equals("socket closed") && !ex.getMessage().equals("Connection reset")) {
                 Logger.getLogger(MultiServerThread.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
@@ -71,16 +72,27 @@ class MultiServerThread extends Thread {
         String modulo = lecturas[0];
         ArrayList<Sensor> listaParMaxMinModulo = bd.getListaParametrosMaxMinModulo(modulo);
         String[] parametros;
+        String fecha;
+        String hora;
         for (int i = 1; i < lecturas.length; i++) {
             try {
                 parametros = lecturas[i].split("&");
-                bd.insertarDatosSensor(modulo + parametros[0], parametros[1]);
+                fecha = Utilitarios.getFechaAAAAMMddGuion();
+                hora = Utilitarios.getHora();
+                bd.insertarDatosSensor(modulo + parametros[0],
+                        Double.parseDouble(parametros[1]),
+                        fecha,
+                        hora);
                 Monitoreo m = new Monitoreo(modulo,
                         modulo + parametros[0],
                         parametros[1],
+                        fecha,
+                        hora,
                         listaParMaxMinModulo, bd);
                 m.start();
             } catch (ArrayIndexOutOfBoundsException ex) {
+                System.out.println("Trama no valida...");
+            } catch (NumberFormatException ex) {
                 System.out.println("Trama no valida...");
             }
         }

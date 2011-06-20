@@ -20,7 +20,7 @@
         <!-- full stacktrace para las excepciones -->
         <layout class="ch.qos.logback.classic.PatternLayout">
             <Pattern>
-                [%p][%d{dd/MM/yyyy HH:mm:ss}][%F][linea %L] %msg%n[excepciones] %exception{full}%n{2}
+                [%p][%d{dd/MM/yyyy HH:mm:ss}][%F][linea %L] %msg%n [%thread][excepciones] %exception{full}%n{2}
             </Pattern>
         </layout>
 
@@ -116,7 +116,7 @@
     <logger name="BaseDatos.BaseDatos" level="TRACE">
         <appender-ref ref="TRACE_BD"/>
         <appender-ref ref="EMAIL"/>
-        <appender-ref ref="pantalla"/>
+       <appender-ref ref="pantalla"/>
     </logger>
 
     <logger name="PrincipalGUI" level="ALL">
