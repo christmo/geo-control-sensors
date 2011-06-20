@@ -1,0 +1,42 @@
+#login {
+    height:300px;
+    width:300px;
+    position:absolute;
+    top:50%;
+    left:50%;
+    margin-top:-100px;
+    margin-left:-150px;
+}
+
+.usuario{
+    text-align: left;
+    margin-left: auto;
+    margin-right: auto;
+    width: 175px;
+}
+
+
+.botones{
+    padding: 15px;
+    text-align: center;
+}
+
+.txtBoton{
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 25px;
+    padding-right: 25px;
+}
+
+.texto{
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+/*
+body {
+    background: #d4e4ef;
+    background: -moz-linear-gradient(left, #d4e4ef 1%, #FCFCFC 100%, #86aecc 100%);
+    background: -webkit-gradient(linear, left top, right top, color-stop(1%,#d4e4ef), color-stop(100%,#FCFCFC), color-stop(100%,#86aecc));
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d4e4ef', endColorstr='#86aecc',GradientType=1 ); 
+}
+*/

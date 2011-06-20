@@ -1,0 +1,83 @@
+body {
+    font-family: sans-serif;
+    font-size: 16px;
+    margin: 10px;
+    /*max-width: 800px;*/
+    text-align: left;
+}
+
+#encabezado{
+    margin:auto;
+    width: 850px;
+    padding-top: 10px;
+    padding-bottom: 25px;
+}
+
+#modulo{
+    text-align:left;
+    width:850px;
+    margin:0 auto;
+    padding:5px;
+    text-align:left;
+    padding-bottom: 50px;
+}
+
+.grafico{
+    width:800px;
+    height:200px;
+    margin: 20px;
+}
+
+#menu{
+    text-align:left;
+    width:650px;
+    margin:0 auto;
+    padding:5px;
+    text-align:left;
+    padding-bottom: 30px;
+}
+
+.tiempo{
+    width: 60px;
+    text-align: center;
+}
+
+.fecha{
+    width: 100px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+#mod{
+    width: 550px;
+    text-align: center;
+    margin:0 auto;
+}
+
+#txtLabel{
+    width: 200px;
+    text-align: left;
+    margin-top: 20px;
+    /*margin-bottom: 5px;*/
+}
+
+#izq {
+    float:left;
+    /*width:100px;*/
+}
+
+#der {
+    float:left;
+    width:100px;
+    /*background:#fc0;*/
+}
+
+#bot{
+    float:left;
+    width:50px;
+}
+
+.param{
+    width: 80px;
+    text-align: center;
+}
