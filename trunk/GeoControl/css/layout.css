@@ -61,6 +61,16 @@ body {
     /*margin-bottom: 5px;*/
 }
 
+#txtIngreso{
+    width: 550px;
+    text-align: left;
+}
+
+#ingLabel{
+    width: 100px;
+    float:left;
+}
+
 #izq {
     float:left;
     /*width:100px;*/
@@ -75,9 +85,26 @@ body {
 #bot{
     float:left;
     width:50px;
+    margin-bottom: 20px;
 }
 
 .param{
     width: 80px;
     text-align: center;
+}
+
+.tdNombre{
+    width: 150px;
+}
+
+#txtNombre{
+    width: 350px;
+}
+
+#txtMail{
+    width: 350px;
+}
+
+#txtTelefono{
+    width: 100px;
 }
