@@ -53,10 +53,7 @@ require_once('php/login/isLogin.php');
                         'txtMail': { required: '<br/>Debe ingresar un correo electrónico', email: '<br/>Debe ingresar el correo electrónico con el formato correcto. <br/>Por ejemplo: soporte@kradac.com' }
                     },
                     debug: true,
-                    /*errorElement: 'div',*/
-                    //errorContainer: $('#errores'),
                     submitHandler: function(form){
-                        //alert('El formulario ha sido validado correctamente!');
                         addTableRow();
                     }
                 });
