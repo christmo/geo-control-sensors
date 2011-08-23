@@ -25,11 +25,21 @@ DROP TABLE IF EXISTS `configuracion`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `configuracion` (
-  `nombre` varchar(10) NOT NULL,
+  `nombre` varchar(100) NOT NULL,
   `valor` varchar(100) NOT NULL,
   PRIMARY KEY (`nombre`,`valor`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `configuracion`
+--
+
+LOCK TABLES `configuracion` WRITE;
+/*!40000 ALTER TABLE `configuracion` DISABLE KEYS */;
+INSERT INTO `configuracion` VALUES ('puerto_server','444'),('tiempo','30');
+/*!40000 ALTER TABLE `configuracion` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `contactos`
@@ -39,13 +49,23 @@ DROP TABLE IF EXISTS `contactos`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `contactos` (
-  `id_con` int(11) NOT NULL,
+  `id_con` int(11) NOT NULL AUTO_INCREMENT,
   `nombre_con` varchar(150) DEFAULT NULL,
   `mail_con` varchar(50) DEFAULT NULL,
-  `telefono` varchar(10) DEFAULT NULL,
+  `telefono` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`id_con`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `contactos`
+--
+
+LOCK TABLES `contactos` WRITE;
+/*!40000 ALTER TABLE `contactos` DISABLE KEYS */;
+INSERT INTO `contactos` VALUES (1,'KRADAC','soporte@kradac.com','072570275 ext: 2980');
+/*!40000 ALTER TABLE `contactos` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `datos`
@@ -62,26 +82,26 @@ CREATE TABLE `datos` (
   `hora_dat` time NOT NULL DEFAULT '00:00:00',
   `parametro_dat` double NOT NULL,
   PRIMARY KEY (`id_dat_inc`,`id_dat_par`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=505 DEFAULT CHARSET=latin1
+) ENGINE=InnoDB AUTO_INCREMENT=57429 DEFAULT CHARSET=latin1
 /*!50100 PARTITION BY HASH (id_dat_par)
 PARTITIONS 365 */;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
 /*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8 */ ;
-/*!50003 SET character_set_results = utf8 */ ;
-/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET character_set_client  = latin1 */ ;
+/*!50003 SET character_set_results = latin1 */ ;
+/*!50003 SET collation_connection  = latin1_swedish_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = '' */ ;
 DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER TGR_DATOS_SENSOR BEFORE INSERT ON DATOS
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `monitorsensores`.`TGR_DATOS_SENSOR` BEFORE INSERT
+    ON monitorsensores.datos FOR EACH ROW
+BEGIN
 
-FOR EACH ROW BEGIN
+    /*SET NEW.HORA_DAT = CURTIME();
 
-    SET NEW.HORA_DAT = CURTIME();
-
-    SET NEW.FECHA_DAT = CURDATE();
+    SET NEW.FECHA_DAT = CURDATE();*/
 
     SET NEW.ID_DAT_PAR = DATE_FORMAT(CURDATE(),'%Y%m%d');
 
@@ -91,6 +111,21 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+
+--
+-- Table structure for table `modulos`
+--
+
+DROP TABLE IF EXISTS `modulos`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `modulos` (
+  `modulo_sen` varchar(100) NOT NULL,
+  `nombre_mod` varchar(100) NOT NULL,
+  `id_suc` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`modulo_sen`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `notificaciones`
@@ -106,7 +141,7 @@ CREATE TABLE `notificaciones` (
   `hora_not` time DEFAULT NULL,
   `id_dat_inc` int(11) DEFAULT NULL,
   PRIMARY KEY (`id_not`)
-) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=458 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -118,15 +153,24 @@ DROP TABLE IF EXISTS `sensores`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `sensores` (
   `id_sen` varchar(10) NOT NULL,
-  `nombre_sen` varchar(100) DEFAULT NULL,
-  `modulo_sen` varchar(5) DEFAULT NULL,
+  `nombre_sen` varchar(13) DEFAULT NULL,
+  `modulo_sen` varchar(100) NOT NULL,
   `par_max_sen` double DEFAULT NULL,
   `par_min_sen` double DEFAULT NULL,
-  `id_suc` int(11) DEFAULT NULL,
   `tipo_sen` varchar(100) NOT NULL DEFAULT '##',
   PRIMARY KEY (`id_sen`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sensores`
+--
+
+LOCK TABLES `sensores` WRITE;
+/*!40000 ALTER TABLE `sensores` DISABLE KEYS */;
+INSERT INTO `sensores` VALUES ('M01T1','TEMPERATURA 1','M01',30,5,'TEMPERATURA'),('M01T2','TEMPERATURA 2','M01',30,5,'TEMPERATURA'),('M01T3','TEMPERATURA 3','M01',30,5,'TEMPERATURA'),('M01T4','TEMPERATURA 4','M01',30,5,'TEMPERATURA'),('M02T1','TEMPERATURA 1','M02',20,10,'TEMPERATURA'),('M02T2','TEMPERATURA 2','M02',20,10,'TEMPERATURA'),('M02T3','TEMPERATURA 3','M02',20,10,'TEMPERATURA'),('M02T4','TEMPERATURA 4','M02',20,10,'TEMPERATURA');
+/*!40000 ALTER TABLE `sensores` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `sucursales`
@@ -148,6 +192,16 @@ CREATE TABLE `sucursales` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `sucursales`
+--
+
+LOCK TABLES `sucursales` WRITE;
+/*!40000 ALTER TABLE `sucursales` DISABLE KEYS */;
+INSERT INTO `sucursales` VALUES (1,'MATRIZ',' Bolívar y Rocafuerte Esquina','072571682',NULL,NULL,NULL);
+/*!40000 ALTER TABLE `sucursales` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `usuarios`
 --
 
@@ -163,6 +217,16 @@ CREATE TABLE `usuarios` (
   PRIMARY KEY (`id_usu`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `usuarios`
+--
+
+LOCK TABLES `usuarios` WRITE;
+/*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
+INSERT INTO `usuarios` VALUES (1,'KRADAC','KRADAC','KRADAC',1);
+/*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Dumping routines for database 'monitorsensores'
@@ -392,4 +456,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2011-06-02 12:28:51
+-- Dump completed on 2011-08-23  9:32:55

@@ -214,6 +214,8 @@ public class BaseDatos {
      * Inserta el dato medido de un sensor determinado
      * @param id_sen
      * @param parametro
+     * @param fecha
+     * @param hora
      * @return boolean true si inserta correctamente
      */
     public boolean insertarDatosSensor(String id_sen, double parametro, String fecha, String hora) {
@@ -317,5 +319,56 @@ public class BaseDatos {
         } catch (NullPointerException ex) {
             return false;
         }
+    }
+
+    /**
+     * Consulta cual es el puerto que debe escuchar el servidor
+     * @return int
+     */
+    public int getPuertoEscucharServidor() {
+        try {
+            String sql = "SELECT VALOR FROM CONFIGURACION WHERE NOMBRE='puerto_server'";
+            int port = Integer.parseInt(ejecutarConsultaUnDato(sql).getString("VALOR"));
+            return port;
+        } catch (SQLException ex) {
+            java.util.logging.Logger.getLogger(BaseDatos.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NumberFormatException ex) {
+            java.util.logging.Logger.getLogger(BaseDatos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return 0;
+    }
+
+    /**
+     * obtener el nombre del sensor
+     * @param id_sen
+     * @return String
+     */
+    public String getNombreSensor(String id_sen) {
+        try {
+            String sql = "SELECT NOMBRE_SEN FROM SENSORES WHERE ID_SEN='" + id_sen + "'";
+            return ejecutarConsultaUnDato(sql).getString("NOMBRE_SEN");
+        } catch (SQLException ex) {
+            java.util.logging.Logger.getLogger(BaseDatos.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NumberFormatException ex) {
+            java.util.logging.Logger.getLogger(BaseDatos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return "";
+    }
+
+    /**
+     * Obtener el nombre del modulo
+     * @param modulo
+     * @return String
+     */
+    public String getNombreModulo(String modulo) {
+        try {
+            String sql = "SELECT NOMBRE_MOD FROM MODULOS WHERE MODULO_SEN='" + modulo + "'";
+            return ejecutarConsultaUnDato(sql).getString("NOMBRE_MOD");
+        } catch (SQLException ex) {
+            java.util.logging.Logger.getLogger(BaseDatos.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NumberFormatException ex) {
+            java.util.logging.Logger.getLogger(BaseDatos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return "";
     }
 }
