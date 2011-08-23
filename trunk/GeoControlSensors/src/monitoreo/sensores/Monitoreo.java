@@ -79,8 +79,8 @@ public class Monitoreo extends Thread {
             id_dato = bd.getIDDatoInsertado(id_sen, hora, param_sen);
             bd.insertarNotificacion(contacto.getId_con(), id_dato);
             AlertaMail alerta = new AlertaMail(
-                    id_sen,
-                    modulo,
+                    bd.getNombreSensor(id_sen),
+                    bd.getNombreModulo(modulo),
                     tipoSensor,
                     param_sen,
                     param_min,

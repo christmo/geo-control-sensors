@@ -96,8 +96,7 @@ public class SMTPConfig {
         } catch (Throwable e) {
             envio = false;
             System.out.println(e.getMessage());
-            e.printStackTrace();
-
+            //e.printStackTrace();
         } finally {
             return envio;
         }

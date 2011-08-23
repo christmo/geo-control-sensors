@@ -107,8 +107,16 @@ public class GUI_Server extends javax.swing.JFrame {
 
                 public void run() {
                     try {
-                        servidor = new MultiServer(444, bd);
+                        bd = new BaseDatos(arcConfig);
+                        int puerto = bd.getPuertoEscucharServidor();
+                        servidor = new MultiServer(puerto, bd);
                         servidor.escucharConexiones();
+                    } catch (NullPointerException ex) {
+                        JOptionPane.showMessageDialog(null,
+                                "NO se pudo cargar el puerto del servidor desde la BD,"
+                                + "\nBase de Datos MySQL no está activa...",
+                                "Error...", 0);
+                        btnIniciar.setSelected(false);
                     } catch (IOException ex) {
                         //Logger.getLogger(GUI_Server.class.getName()).log(Level.SEVERE, null, ex);
                         if (!ex.getMessage().equals("socket closed")) {
@@ -124,11 +132,16 @@ public class GUI_Server extends javax.swing.JFrame {
             server.start();
 
         } else {
-            /**
-             * Solo para la ejecución del servidor mostrando el mensaje no cierra
-             * la ventana
-             */
-            pararServidorConexiones(false);
+
+            try {
+                /**
+                 * Solo para la ejecución del servidor mostrando el mensaje no cierra
+                 * la ventana
+                 */
+                pararServidorConexiones(false);
+            } catch (NullPointerException ex) {
+                System.out.println("No hay conexiones que cerrar...");
+            }
         }
     }//GEN-LAST:event_btnIniciarActionPerformed
 
