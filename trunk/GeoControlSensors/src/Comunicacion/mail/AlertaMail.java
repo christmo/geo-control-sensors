@@ -4,6 +4,7 @@
  */
 package Comunicacion.mail;
 
+import BaseDatos.BaseDatos;
 import Utilitarios.Utilitarios;
 
 /**
@@ -11,10 +12,11 @@ import Utilitarios.Utilitarios;
  * @author kradac
  */
 public class AlertaMail extends Thread {
-
+    
     private String mailPara;
     private String titulo;
     private StringBuilder mensaje;
+    private BaseDatos bd;
 
     /**
      * Envia un email con la informacion del sensor al contacto que se especifica
@@ -29,25 +31,28 @@ public class AlertaMail extends Thread {
     public AlertaMail(String sensor,
             String modulo,
             String tipoSen,
-            double paramMedido,
+            String paramMedido,
             double parMin,
             double parMax,
             String mailPara,
-            String nombre) {
+            String nombre,
+            BaseDatos bd) {
+        
         this.mailPara = mailPara;
+        this.bd = bd;
         this.titulo = "Alerta!!! Sensor [" + sensor + "]";
-
+        
         mensaje = new StringBuilder();
         mensaje.append(nombre).append(",<br/><br/>");
         mensaje.append("Le informamos que hay un sensor fuera de los limites permitidos:<br/>");
         mensaje.append("<br/>Sensor: ").append(sensor);
         mensaje.append("<br/>Modulo: ").append(modulo);
-
+        
         mensaje.append("<br/><br/>Mensaje:<br/><br/>");
         mensaje.append("Este sensor de ").
                 append(tipoSen).
                 append(" ha registrado la siguiente lectura: <h1>").
-                append(+paramMedido).
+                append(paramMedido).
                 append("</h1> ").
                 append("Los limites para este sensor son: MIN[ <b>").
                 append(parMin).
@@ -58,9 +63,9 @@ public class AlertaMail extends Thread {
         mensaje.append("<br/>Hora: ").append(Utilitarios.getHora());
         mensaje.append("<br/><br/>-------------<br/>KRADAC<br/>");
     }
-
+    
     @Override
     public void run() {
-        boolean envio = SMTPConfig.sendMail(titulo, mensaje.toString(), mailPara);
+        SMTPConfig.sendMail(titulo, mensaje.toString(), mailPara, bd);
     }
 }

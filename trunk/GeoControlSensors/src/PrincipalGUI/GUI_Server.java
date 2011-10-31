@@ -11,17 +11,20 @@
 package PrincipalGUI;
 
 import BaseDatos.BaseDatos;
+import Comunicacion.comm.CommMensajes;
+import Comunicacion.comm.EnviarSMS;
 import Comunicacion.server.MultiServer;
 import Utilitarios.Utilitarios;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -32,6 +35,11 @@ public class GUI_Server extends javax.swing.JFrame {
     private MultiServer servidor;
     public static Properties arcConfig;
     private BaseDatos bd;
+    public static CommMensajes comm;
+    /**
+     * Logger para guardar los log en un archivo y enviar por mail los de error
+     */
+    private static final Logger log = LoggerFactory.getLogger(BaseDatos.class);
 
     /** Creates new form GUI_Server */
     public GUI_Server() {
@@ -48,10 +56,43 @@ public class GUI_Server extends javax.swing.JFrame {
             arcConfig = Utilitarios.obtenerArchivoPropiedades("configuracion.properties");
             bd = new BaseDatos(arcConfig);
         } catch (FileNotFoundException ex) {
-            //Logger.getLogger(GUI_Server.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(null,
                     "No se encontró el archivo de configuración...",
                     "Error...", 0);
+            System.exit(0);
+        }
+        enviarSMS();
+    }
+
+    /**
+     * Ejecuta un hilo que revisa si hay mensajes en la cola para enviar, este
+     * trabaja cada segundo revisando los mensajes.
+     */
+    public final void enviarSMS() {
+        String sendSMS = bd.getValorConfiguracion("sms");
+        if (sendSMS.equals("si") || sendSMS.equals("SI")
+                || sendSMS.equals("true")) {
+            abrirPuertoSerial();
+            EnviarSMS sms = new EnviarSMS();
+            sms.start();
+        }
+    }
+
+    /**
+     * Abrir Puerto Serial para el envio de SMS con el modem
+     */
+    public final void abrirPuertoSerial() {
+        try {
+            String strPuertoCom = bd.getValorConfiguracion("comm");
+            if (!strPuertoCom.equals("0")) {
+                comm = new CommMensajes(strPuertoCom);
+                comm.start();
+
+                comm.enviarDatos("AT\r\n");
+            }
+        } catch (NullPointerException ex) {
+            JOptionPane.showMessageDialog(null, "No esta configurado el COMM en la BD", "Error...", 0);
+            log.trace("No esta configurado el COMM en la BD.");
             System.exit(0);
         }
     }
@@ -107,18 +148,20 @@ public class GUI_Server extends javax.swing.JFrame {
 
                 public void run() {
                     try {
-                        bd = new BaseDatos(arcConfig);
                         int puerto = bd.getPuertoEscucharServidor();
                         servidor = new MultiServer(puerto, bd);
                         servidor.escucharConexiones();
                     } catch (NullPointerException ex) {
                         JOptionPane.showMessageDialog(null,
-                                "NO se pudo cargar el puerto del servidor desde la BD,"
-                                + "\nBase de Datos MySQL no está activa...",
-                                "Error...", 0);
-                        btnIniciar.setSelected(false);
+                                "No se puede obtener el puerto del servidor de la base de datos,\n"
+                                + "Revisar la base de datos...", "Error...", 0);
+                        System.exit(0);
+                    } catch (SQLException ex) {
+                        JOptionPane.showMessageDialog(null,
+                                "No se puede obtener el puerto del servidor de la base de datos,\n"
+                                + "Revisar la base de datos...", "Error...", 0);
+                        System.exit(0);
                     } catch (IOException ex) {
-                        //Logger.getLogger(GUI_Server.class.getName()).log(Level.SEVERE, null, ex);
                         if (!ex.getMessage().equals("socket closed")) {
                             System.out.println(ex.getMessage());
                             JOptionPane.showMessageDialog(null,
@@ -208,9 +251,9 @@ public class GUI_Server extends javax.swing.JFrame {
     private void cerrarConexiones() {
         try {
             servidor.cerrarConexionServidorMultiple();
-            System.out.println("Parar servidor no se aceptan mas conexiones...");
+            log.trace("Parar servidor no se aceptan mas conexiones...");
         } catch (IOException ex) {
-            Logger.getLogger(GUI_Server.class.getName()).log(Level.SEVERE, null, ex);
+            log.trace("Error al cerrar la conexión...", ex);
         }
     }
 }

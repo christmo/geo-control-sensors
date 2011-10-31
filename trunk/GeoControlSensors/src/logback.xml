@@ -58,12 +58,12 @@
         </triggeringPolicy>
     </appender>
 
-    <appender name="TRACE_SERVIDOR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <appender name="TRACE_COMUNICACION" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>TRACE</level>
         </filter>
 
-        <File>${logPath}/${fecha}/${appName}-SERVER.log</File>
+        <File>${logPath}/${fecha}/${appName}-COM.log</File>
 
         <!-- full stacktrace para las excepciones -->
         <layout class="ch.qos.logback.classic.PatternLayout">
@@ -73,7 +73,7 @@
         </layout>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${logPath}/%d{yyyy-MM-dd}/${appName}-SERVER.log</FileNamePattern>
+            <FileNamePattern>${logPath}/%d{yyyy-MM-dd}/${appName}-COM.log</FileNamePattern>
             <!-- mantener 5 días de historia -->
             <MaxHistory>5</MaxHistory>
         </rollingPolicy>
@@ -101,7 +101,7 @@
         <SMTPPort>465</SMTPPort>
         <SSL>true</SSL>
         <Username>soporte@kradac.com</Username>
-        <Password>superkradacalrescate</Password>
+        <Password></Password>
 
         <To>soporte@kradac.com</To>
         <From>soporte@kradac.com</From>
@@ -116,7 +116,7 @@
     <logger name="BaseDatos.BaseDatos" level="TRACE">
         <appender-ref ref="TRACE_BD"/>
         <appender-ref ref="EMAIL"/>
-       <appender-ref ref="pantalla"/>
+       <!--<appender-ref ref="pantalla"/>-->
     </logger>
 
     <logger name="PrincipalGUI" level="ALL">
@@ -127,7 +127,7 @@
 
     <logger name="Comunicacion" level="ALL">
         <appender-ref ref="EMAIL"/>
-        <appender-ref ref="TRACE_SERVIDOR"/>
+        <appender-ref ref="TRACE_COMUNICACION"/>
         <appender-ref ref="pantalla"/>
     </logger>
 
