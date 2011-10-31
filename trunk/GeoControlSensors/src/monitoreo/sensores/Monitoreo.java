@@ -11,13 +11,15 @@ import Comunicacion.mail.AlertaMail;
 import Utilitarios.Utilitarios;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author kradac
  */
 public class Monitoreo extends Thread {
-    
+
     private String modulo;
     private String id_sen;
     private double param_sen;
@@ -25,6 +27,10 @@ public class Monitoreo extends Thread {
     private String hora;
     private BaseDatos bd;
     private ArrayList<Sensor> listaParMaxMinModulo = new ArrayList<Sensor>();
+    /**
+     * Logger para guardar los log en un archivo y enviar por mail los de error
+     */
+    private static final Logger log = LoggerFactory.getLogger(Monitoreo.class);
 
     /**
      * Comprobación de los parametros medidos del sensor para saber si hay que 
@@ -49,7 +55,7 @@ public class Monitoreo extends Thread {
         this.listaParMaxMinModulo = listaParMaxMinModulo;
         this.bd = bd;
     }
-    
+
     @Override
     public void run() {
         boolean r = false;
@@ -79,14 +85,14 @@ public class Monitoreo extends Thread {
         ArrayList<Contactos> listaContactos = bd.getListaContactosReportar(id_sen);
         int id_dato = 0;
         DecimalFormat format = new DecimalFormat("##.##");
-        
+
         String mod = bd.getNombreModulo(modulo);
         String sensor = bd.getNombreSensor(id_sen);
-        
+
         for (Contactos contacto : listaContactos) {
             id_dato = bd.getIDDatoInsertado(id_sen, hora, param_sen);
             bd.insertarNotificacion(contacto.getId_con(), id_dato);
-            
+
             AlertaMail alerta = new AlertaMail(
                     sensor,
                     mod,
@@ -97,18 +103,21 @@ public class Monitoreo extends Thread {
                     contacto.getStrMail(),
                     contacto.getStrNombre(), bd);
             alerta.start();
-            
-            String sendSMS = bd.getValorConfiguracion("sms");
-            if (sendSMS.equals("si") || sendSMS.equals("SI")
-                    || sendSMS.equals("true")) {
-                String mensaje = "ALARMA DE TEMPERATURA\n" + mod
-                        + "\n" + sensor + " : " + format.format(param_sen)
-                        + "\nFECHA:" + Utilitarios.getFechaAAAAMMddSlash()
-                        + "\nHORA:" + Utilitarios.getHora();
-                
-                EnviarSMS.listaMensajes.add(new SMS(mensaje, contacto.getStrNumero()));
+            try {
+                String sendSMS = bd.getValorConfiguracion("sms");
+                if (sendSMS.equals("si") || sendSMS.equals("SI")
+                        || sendSMS.equals("true")) {
+                    String mensaje = "ALARMA DE TEMPERATURA\n" + mod
+                            + "\n" + sensor + " : " + format.format(param_sen)
+                            + "\nFECHA:" + Utilitarios.getFechaAAAAMMddSlash()
+                            + "\nHORA:" + Utilitarios.getHora();
+
+                    EnviarSMS.listaMensajes.add(new SMS(mensaje, contacto.getStrNumero()));
+                }
+            } catch (NullPointerException ex) {
+                log.trace("No está la directiva para enviar SMS en la base de datos...");
             }
-            
+
         }
     }
 }
