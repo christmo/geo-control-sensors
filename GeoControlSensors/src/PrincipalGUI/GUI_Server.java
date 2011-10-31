@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,12 +70,16 @@ public class GUI_Server extends javax.swing.JFrame {
      * trabaja cada segundo revisando los mensajes.
      */
     public final void enviarSMS() {
-        String sendSMS = bd.getValorConfiguracion("sms");
-        if (sendSMS.equals("si") || sendSMS.equals("SI")
-                || sendSMS.equals("true")) {
-            abrirPuertoSerial();
-            EnviarSMS sms = new EnviarSMS();
-            sms.start();
+        try {
+            String sendSMS = bd.getValorConfiguracion("sms");
+            if (sendSMS.equals("si") || sendSMS.equals("SI")
+                    || sendSMS.equals("true")) {
+                abrirPuertoSerial();
+                EnviarSMS sms = new EnviarSMS();
+                sms.start();
+            }
+        } catch (NullPointerException ex) {
+            log.trace("No está la directiva para enviar SMS en la base de datos...");
         }
     }
 

@@ -101,7 +101,7 @@
         <SMTPPort>465</SMTPPort>
         <SSL>true</SSL>
         <Username>soporte@kradac.com</Username>
-        <Password></Password>
+        <Password>kradacloja</Password>
 
         <To>soporte@kradac.com</To>
         <From>soporte@kradac.com</From>
@@ -113,18 +113,18 @@
         </layout>
     </appender>
 
-    <logger name="BaseDatos.BaseDatos" level="TRACE">
-        <appender-ref ref="TRACE_BD"/>
-        <appender-ref ref="EMAIL"/>
-       <!--<appender-ref ref="pantalla"/>-->
-    </logger>
-
     <logger name="PrincipalGUI" level="ALL">
         <appender-ref ref="EMAIL"/>
         <appender-ref ref="TRACE_PRINCIPAL"/>
         <appender-ref ref="pantalla"/>
     </logger>
 
+    <logger name="BaseDatos.BaseDatos" level="TRACE">
+        <appender-ref ref="TRACE_BD"/>
+        <appender-ref ref="EMAIL"/>
+        <appender-ref ref="pantalla"/>
+    </logger>
+    
     <logger name="Comunicacion" level="ALL">
         <appender-ref ref="EMAIL"/>
         <appender-ref ref="TRACE_COMUNICACION"/>
