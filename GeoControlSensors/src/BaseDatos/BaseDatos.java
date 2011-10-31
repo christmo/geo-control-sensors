@@ -12,7 +12,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Properties;
-import java.util.logging.Level;
 import monitoreo.sensores.Contactos;
 import monitoreo.sensores.Sensor;
 import org.slf4j.Logger;
@@ -137,7 +136,12 @@ public class BaseDatos {
             log.trace("Consultar:" + sql);
         } catch (SQLException ex) {
             int intCode = ex.getErrorCode();
-            log.trace("Error al consultar codigo[" + intCode + "]", ex);
+            if (intCode == 0) {
+                log.trace("Error de comunicación con la BD, mucho tiempo esperando respuesta...");
+                reconectarBaseDatos();
+            } else {
+                log.trace("Error al consultar codigo[" + intCode + "]", ex);
+            }
         } catch (NullPointerException ex) {
             log.trace("No se pudo crear el statement...", ex);
         }
@@ -161,9 +165,14 @@ public class BaseDatos {
             int intCode = ex.getErrorCode();
             if (intCode == 0) {
                 log.trace("Error de comunicación con la BD, mucho tiempo esperando respuesta...");
+                reconectarBaseDatos();
+            } else if (intCode == 1146) {//tabla no existe
+                log.trace("Tabla no existe: {}", ex.getMessage());
             } else {
                 log.trace("Error al consultar codigo[" + intCode + "]", ex);
             }
+        } catch (NullPointerException npx) {
+            log.info("No se puede aceceder a la base de datos...");
         }
         return rsCUD;
     }
@@ -243,7 +252,7 @@ public class BaseDatos {
                         r.getString("TIPO_SEN")));
             }
         } catch (SQLException ex) {
-            java.util.logging.Logger.getLogger(BaseDatos.class.getName()).log(Level.SEVERE, null, ex);
+            log.trace("COD[{}]", ex.getErrorCode(), ex);
         } catch (NullPointerException ex) {
         }
         return lista;
@@ -257,16 +266,17 @@ public class BaseDatos {
      */
     public ArrayList<Contactos> getListaContactosReportar(String id_sen) {
         ArrayList<Contactos> lista = new ArrayList<Contactos>();
-        String sql = "SELECT ID_CON,MAIL_CON,NOMBRE_CON FROM CONTACTOS";
+        String sql = "SELECT ID_CON,MAIL_CON,NOMBRE_CON,TELEFONO FROM CONTACTOS";
         ResultSet r = ejecutarConsulta(sql);
         try {
             while (r.next()) {
                 lista.add(new Contactos(r.getInt("ID_CON"),
                         r.getString("MAIL_CON"),
-                        r.getString("NOMBRE_CON")));
+                        r.getString("NOMBRE_CON"),
+                        r.getString("TELEFONO")));
             }
         } catch (SQLException ex) {
-            java.util.logging.Logger.getLogger(BaseDatos.class.getName()).log(Level.SEVERE, null, ex);
+            log.trace("COD[{}]", ex.getErrorCode(), ex);
         }
         return lista;
     }
@@ -285,7 +295,7 @@ public class BaseDatos {
         try {
             return r.getInt(1);
         } catch (SQLException ex) {
-            java.util.logging.Logger.getLogger(BaseDatos.class.getName()).log(Level.SEVERE, null, ex);
+            log.trace("COD[{}]", ex.getErrorCode(), ex);
         } catch (NullPointerException ex) {
         }
         return 0;
@@ -325,17 +335,9 @@ public class BaseDatos {
      * Consulta cual es el puerto que debe escuchar el servidor
      * @return int
      */
-    public int getPuertoEscucharServidor() {
-        try {
-            String sql = "SELECT VALOR FROM CONFIGURACION WHERE NOMBRE='puerto_server'";
-            int port = Integer.parseInt(ejecutarConsultaUnDato(sql).getString("VALOR"));
-            return port;
-        } catch (SQLException ex) {
-            java.util.logging.Logger.getLogger(BaseDatos.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NumberFormatException ex) {
-            java.util.logging.Logger.getLogger(BaseDatos.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return 0;
+    public int getPuertoEscucharServidor() throws NullPointerException, SQLException {
+        String sql = "SELECT VALOR FROM CONFIGURACION WHERE NOMBRE='puerto_server'";
+        return ejecutarConsultaUnDato(sql).getInt("VALOR");
     }
 
     /**
@@ -348,9 +350,9 @@ public class BaseDatos {
             String sql = "SELECT NOMBRE_SEN FROM SENSORES WHERE ID_SEN='" + id_sen + "'";
             return ejecutarConsultaUnDato(sql).getString("NOMBRE_SEN");
         } catch (SQLException ex) {
-            java.util.logging.Logger.getLogger(BaseDatos.class.getName()).log(Level.SEVERE, null, ex);
+            log.trace("COD[{}]", ex.getErrorCode(), ex);
         } catch (NumberFormatException ex) {
-            java.util.logging.Logger.getLogger(BaseDatos.class.getName()).log(Level.SEVERE, null, ex);
+            log.trace("{}", ex.getMessage(), ex);
         }
         return "";
     }
@@ -365,10 +367,59 @@ public class BaseDatos {
             String sql = "SELECT NOMBRE_MOD FROM MODULOS WHERE MODULO_SEN='" + modulo + "'";
             return ejecutarConsultaUnDato(sql).getString("NOMBRE_MOD");
         } catch (SQLException ex) {
-            java.util.logging.Logger.getLogger(BaseDatos.class.getName()).log(Level.SEVERE, null, ex);
+            log.trace("COD[{}]", ex.getErrorCode(), ex);
         } catch (NumberFormatException ex) {
-            java.util.logging.Logger.getLogger(BaseDatos.class.getName()).log(Level.SEVERE, null, ex);
+            log.trace("{}", ex.getMessage(), ex);
+        } catch (NullPointerException ex) {
         }
         return "";
+    }
+
+    /**
+     * Obtiene el valor de la tabla de configuraciones de una determinada llave,
+     * este metodo se utiliza para utilizar las configuraciones de la base de datos
+     * y no del archivo de configuración
+     * @param key
+     * @return String
+     */
+    public String getValorConfiguracion(String key) {
+        try {
+            String sql = "SELECT VALOR FROM CONFIGURACION WHERE NOMBRE='" + key + "'";
+            ResultSet rsConfig = ejecutarConsultaUnDato(sql);
+            return rsConfig.getString("VALOR");
+        } catch (SQLException ex) {
+            if (ex.getErrorCode() == 0) {
+                log.info("No se encontró valores para esta llave [{}]", key);
+            } else {
+                log.info("[COD {}]{}", ex.getErrorCode(), ex.getMessage());
+            }
+        }
+        return null;
+    }
+
+    private void reconectarBaseDatos() {
+        CerrarConexion();
+        String driver = "com.mysql.jdbc.Driver";
+        String url = "jdbc:mysql://" + ip + "/" + bd;
+        try {
+            try {
+                Class.forName(driver).newInstance();
+            } catch (InstantiationException ex) {
+                log.trace("No se puede cargar el driver de la base de datos...", ex);
+            } catch (IllegalAccessException ex) {
+                log.trace("No se puede cargar el driver de la base de datos acceso ilegal...", ex);
+            }
+        } catch (ClassNotFoundException ex) {
+            log.trace("No se puede cargar el driver de la base de datos...", ex);
+        }
+        try {
+            conexion = DriverManager.getConnection(url, usr, pass);
+        } catch (SQLException ex) {
+            if (ex.getMessage().equals("Communications link failure")) {
+                log.trace("Enlace de conexión con la base de datos falló, falta el archivo de configuración...");
+            }
+        }
+
+        log.info("Iniciar RECONEXION BD [" + this.bd + "]");
     }
 }

@@ -13,6 +13,7 @@ public class Contactos {
     private int id_con;
     private String strMail;
     private String strNombre;
+    private String strNumero;
 
     /**
      * Información basica de un contacto...
@@ -20,10 +21,11 @@ public class Contactos {
      * @param strMail
      * @param strNombre
      */
-    public Contactos(int id_con, String strMail, String strNombre) {
+    public Contactos(int id_con, String strMail, String strNombre,String numero) {
         this.id_con = id_con;
         this.strMail = strMail;
         this.strNombre = strNombre;
+        this.strNumero = numero;
     }
 
     /**
@@ -66,5 +68,19 @@ public class Contactos {
      */
     public void setStrNombre(String strNombre) {
         this.strNombre = strNombre;
+    }
+
+    /**
+     * @return the strNumero
+     */
+    public String getStrNumero() {
+        return strNumero;
+    }
+
+    /**
+     * @param strNumero the strNumero to set
+     */
+    public void setStrNumero(String strNumero) {
+        this.strNumero = strNumero;
     }
 }

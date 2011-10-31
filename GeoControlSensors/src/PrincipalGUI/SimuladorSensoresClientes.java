@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package Comunicacion.server;
+package PrincipalGUI;
 
 /**
  *
@@ -13,7 +13,7 @@ import java.net.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Cliente {
+public class SimuladorSensoresClientes {
 
     public static void main(String[] args) {
         try {
@@ -38,20 +38,20 @@ public class Cliente {
             while (true) {
                 //demo = "M01%T1&" + (int)(Math.random() * 30) + "%T2&" + (int)(Math.random() * 30) + "%T3&" + (int)(Math.random() * 30) + "%T4&" + (int)(Math.random() * 30)+"\n";
                 //demo = "M01%T1&" + (int) (Math.random() * 30) + "%T2&" + (int) (Math.random() * 30) + "\n";
-                demo = "M01%T1&" + (Math.random() * 30)+ "\n";
+                demo = "M02%T1&" + (Math.random() * 100)+ "\n";
                 System.out.print("" + demo);
                 ou.write(demo.getBytes());
                 try {
-                    Thread.sleep(1000 * 60);
+                    Thread.sleep(1000 * 30);
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(SimuladorSensoresClientes.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
             // Cuando se alcance el fin de fichero, cerramos la conexión y
             // abandonamos
             //s.close();
         } catch (IOException ex) {
-            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SimuladorSensoresClientes.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

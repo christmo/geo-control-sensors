@@ -4,6 +4,7 @@
  */
 package Comunicacion.mail;
 
+import BaseDatos.BaseDatos;
 import java.security.Security;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -23,13 +24,17 @@ import javax.mail.internet.MimeMessage;
  */
 public class SMTPConfig {
 
+    private static BaseDatos bd;
+
     /**
      * @param titulo : titulo del mensaje
      * @param mensaje : Cuerpo del Mensaje
      * @param paraEmail : Email receptor del mensaje
      * @return true si el envío es conforme y false si no es así.
      */
-    public static synchronized boolean sendMail(String titulo, String mensaje, String paraEmail) {
+    public static synchronized boolean sendMail(String titulo, String mensaje,
+            String paraEmail, BaseDatos bd) {
+        SMTPConfig.bd = bd;
         boolean envio = false;
 
         try {
@@ -41,16 +46,26 @@ public class SMTPConfig {
 
             //Propiedades de la conexion
             Properties propiedades = new Properties();
-            propiedades.setProperty("mail.transport.protocol", props.getString("mail.transport.protocol"));
-            propiedades.setProperty("mail.host", props.getString("mail.host"));
-            propiedades.put("mail.smtp.auth", props.getString("mail.smtp.auth"));
-            propiedades.put("mail.smtp.port", props.getString("mail.smtp.port"));
-            propiedades.put("mail.smtp.socketFactory.port", props.getString("mail.smtp.socketFactory.port"));
-            propiedades.put("mail.smtp.socketFactory.class", props.getString("mail.smtp.socketFactory.class"));
-            propiedades.put("mail.smtp.socketFactory.fallback", props.getString("mail.smtp.socketFactory.fallback"));
-            propiedades.put("mail.smtp.mail.sender", props.getString("mail.smtp.mail.sender"));
-
-            propiedades.setProperty("mail.smtp.quitwait", props.getString("mail.smtp.quitwait"));
+//            propiedades.setProperty("mail.transport.protocol", props.getString("mail.transport.protocol"));
+//            propiedades.setProperty("mail.host", props.getString("mail.host"));
+//            propiedades.put("mail.smtp.auth", props.getString("mail.smtp.auth"));
+//            propiedades.put("mail.smtp.port", props.getString("mail.smtp.port"));
+//            propiedades.put("mail.smtp.socketFactory.port", props.getString("mail.smtp.socketFactory.port"));
+//            propiedades.put("mail.smtp.socketFactory.class", props.getString("mail.smtp.socketFactory.class"));
+//            propiedades.put("mail.smtp.socketFactory.fallback", props.getString("mail.smtp.socketFactory.fallback"));
+//            propiedades.put("mail.smtp.mail.sender", props.getString("mail.smtp.mail.sender"));
+//
+            
+            propiedades.setProperty("mail.transport.protocol", bd.getValorConfiguracion("mail.transport.protocol"));
+            propiedades.setProperty("mail.host", bd.getValorConfiguracion("mail.host"));
+            propiedades.put("mail.smtp.auth", bd.getValorConfiguracion("mail.smtp.auth"));
+            propiedades.put("mail.smtp.port", bd.getValorConfiguracion("mail.smtp.port"));
+          //  propiedades.put("mail.smtp.socketFactory.port", bd.getValorConfiguracion("mail.smtp.socketFactory.port"));
+          //  propiedades.put("mail.smtp.socketFactory.class", bd.getValorConfiguracion("mail.smtp.socketFactory.class"));
+            propiedades.put("mail.smtp.socketFactory.fallback", bd.getValorConfiguracion("mail.smtp.socketFactory.fallback"));
+            propiedades.put("mail.smtp.mail.sender", bd.getValorConfiguracion("mail.smtp.mail.sender"));
+            propiedades.put("mail.smtp.ssl.enable", bd.getValorConfiguracion("mail.smtp.ssl.enable"));
+            propiedades.setProperty("mail.smtp.quitwait", bd.getValorConfiguracion("mail.smtp.quitwait"));
 
 
             //Preparamos la Sesion autenticando al usuario
@@ -60,27 +75,26 @@ public class SMTPConfig {
                 //byte[] output = dec.decodeBuffer(props.getString("mail.password"));
 
                 /*protected String decodPass(byte[] cod) {
-                    String pass = "";
-                    for (byte b : output) {
-                        pass += (char) b;
-                    }
-                    return pass;
+                String pass = "";
+                for (byte b : output) {
+                pass += (char) b;
+                }
+                return pass;
                 }*/
-
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
 //                    return new PasswordAuthentication(props.getString("mail.user"), decodPass(output));
-                    return new PasswordAuthentication(props.getString("mail.user"), props.getString("mail.password"));
+                    return new PasswordAuthentication(SMTPConfig.bd.getValorConfiguracion("mail.user"), SMTPConfig.bd.getValorConfiguracion("mail.password"));
                 }
             });
 
             //Preparamos el Mensaje
             MimeMessage message = new MimeMessage(session);
-            message.setSender(new InternetAddress(props.getString("mail.email")));
+            message.setSender(new InternetAddress(bd.getValorConfiguracion("mail.email")));
             message.setSubject(titulo);
             message.setContent(mensaje, "text/html; charset=utf-8");
-            message.setFrom(new InternetAddress(props.getString("mail.smtp.mail.sender")));
-            message.setReplyTo(InternetAddress.parse(props.getString("mail.smtp.mail.sender")));
+            message.setFrom(new InternetAddress(bd.getValorConfiguracion("mail.smtp.mail.sender")));
+            message.setReplyTo(InternetAddress.parse(bd.getValorConfiguracion("mail.smtp.mail.sender")));
 
 
             if (paraEmail.indexOf(',') > 0) {

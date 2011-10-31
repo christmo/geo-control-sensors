@@ -5,8 +5,11 @@
 package monitoreo.sensores;
 
 import BaseDatos.BaseDatos;
+import Comunicacion.comm.EnviarSMS;
+import Comunicacion.comm.SMS;
 import Comunicacion.mail.AlertaMail;
 import Utilitarios.Utilitarios;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 /**
@@ -14,14 +17,14 @@ import java.util.ArrayList;
  * @author kradac
  */
 public class Monitoreo extends Thread {
-
+    
     private String modulo;
     private String id_sen;
     private double param_sen;
-    private String fecha;
+    //private String fecha;
     private String hora;
     private BaseDatos bd;
-    ArrayList<Sensor> listaParMaxMinModulo = new ArrayList<Sensor>();
+    private ArrayList<Sensor> listaParMaxMinModulo = new ArrayList<Sensor>();
 
     /**
      * Comprobación de los parametros medidos del sensor para saber si hay que 
@@ -41,12 +44,12 @@ public class Monitoreo extends Thread {
         this.modulo = modulo;
         this.id_sen = id_sen;
         this.param_sen = Double.parseDouble(param_sen);
-        this.fecha = fecha;
+        //this.fecha = fecha;
         this.hora = hora;
         this.listaParMaxMinModulo = listaParMaxMinModulo;
         this.bd = bd;
     }
-
+    
     @Override
     public void run() {
         boolean r = false;
@@ -75,19 +78,37 @@ public class Monitoreo extends Thread {
     private synchronized void lanzarAlerta(double param_min, double param_max, String tipoSensor) {
         ArrayList<Contactos> listaContactos = bd.getListaContactosReportar(id_sen);
         int id_dato = 0;
+        DecimalFormat format = new DecimalFormat("##.##");
+        
+        String mod = bd.getNombreModulo(modulo);
+        String sensor = bd.getNombreSensor(id_sen);
+        
         for (Contactos contacto : listaContactos) {
             id_dato = bd.getIDDatoInsertado(id_sen, hora, param_sen);
             bd.insertarNotificacion(contacto.getId_con(), id_dato);
+            
             AlertaMail alerta = new AlertaMail(
-                    bd.getNombreSensor(id_sen),
-                    bd.getNombreModulo(modulo),
+                    sensor,
+                    mod,
                     tipoSensor,
-                    param_sen,
+                    format.format(param_sen),
                     param_min,
                     param_max,
                     contacto.getStrMail(),
-                    contacto.getStrNombre());
+                    contacto.getStrNombre(), bd);
             alerta.start();
+            
+            String sendSMS = bd.getValorConfiguracion("sms");
+            if (sendSMS.equals("si") || sendSMS.equals("SI")
+                    || sendSMS.equals("true")) {
+                String mensaje = "ALARMA DE TEMPERATURA\n" + mod
+                        + "\n" + sensor + " : " + format.format(param_sen)
+                        + "\nFECHA:" + Utilitarios.getFechaAAAAMMddSlash()
+                        + "\nHORA:" + Utilitarios.getHora();
+                
+                EnviarSMS.listaMensajes.add(new SMS(mensaje, contacto.getStrNumero()));
+            }
+            
         }
     }
 }
