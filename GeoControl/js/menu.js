@@ -12,6 +12,10 @@ $(function() {
         }
     }).next().button({
         icons: {
+            primary: "ui-icon-locked"
+        }
+    }).next().button({
+        icons: {
             primary: "ui-icon-gear"
         }
     }).next().button({
@@ -37,4 +41,8 @@ function historico(){
 
 function configuracion(){
     window.location='config.php';
+}
+
+function notificaciones(){
+    window.location='notificaciones.php';
 }

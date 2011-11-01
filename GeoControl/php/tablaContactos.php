@@ -19,19 +19,25 @@ $sql = "SELECT ID_CON,NOMBRE_CON, MAIL_CON, TELEFONO
 
 $result = consultarVariasFilas($sql);
 
-echo "<div id=\"mod\">";
-echo "<div class=\"ui-widget\">";
-echo "<table id=\"myTable\">";
+//echo "<div id=\"mod\">";
+//echo "<div class=\"ui-widget\">";
+echo "<table id=\"tablaContactos\" RULES=ROWS FRAME=HSIDES>";
+echo "<tr class=\"trTitulo\">
+    <td>Nombre</td>
+    <td>Correo</td>
+    <td>Tel&eacute;fono</td>
+    <td>Eliminar</td>
+    </tr>";
 for ($i = 0; $i < count($result); $i++) {
     $fila = $result[$i];
     echo "<tr>";
     echo "<td class=\"tdNombre\">";
     echo $fila["NOMBRE_CON"];
     echo "</td>";
-    echo "<td class=\"tdNombre\">";
+    echo "<td class=\"tdCorreo\">";
     echo $fila["MAIL_CON"];
     echo "</td>";
-    echo "<td class=\"tdNombre\">";
+    echo "<td class=\"tdTelefono\">";
     echo $fila["TELEFONO"];
     echo "</td>";
     echo "<td>";
@@ -40,13 +46,13 @@ for ($i = 0; $i < count($result); $i++) {
     echo "</tr>";
 }
 echo "</table>";
-echo "</div>";
-echo "</div>";
+//echo "</div>";
+//echo "</div>";
 
 echo "<script type=\"text/javascript\">
 
             $(document).ready(function(){
-                $('#myTable td img.delete').click(function(){
+                $('#tablaContactos td img.delete').click(function(){
                     var id = $(this).attr('id');
                     $('#tabla').load(\"php/tablaContactos.php?id=\"+id);
                 });

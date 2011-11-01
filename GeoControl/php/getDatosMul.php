@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Se utiliza para sacar los ultimos puntos de un modulo, dentro de la hora en
  * la que se encuentra la maquina
@@ -9,14 +10,20 @@ extract($_GET);
 /**
  * Hora minima para graficar el punto de las lineas de los limites
  */
-$hora_min = "SELECT MIN((UNIX_TIMESTAMP(CONCAT(FECHA_DAT,' ',HORA_DAT))*1000)-(5*60*60*1000)) AS HORA
+$hora_min = "SELECT ((UNIX_TIMESTAMP(CONCAT(FECHA_DAT,' ',HORA_DAT))*1000)-(5*60*60*1000)) AS HORA
+            /*SELECT MIN((UNIX_TIMESTAMP(CONCAT(FECHA_DAT,' ',HORA_DAT))*1000)-(5*60*60*1000)) AS HORA*/
             FROM DATOS
-            WHERE ID_SEN LIKE '$mod%'
+            /*WHERE ID_SEN LIKE '$mod%'*/
+            WHERE ID_SEN = '" . $mod . "T1'
             AND ID_DAT_PAR=DATE_FORMAT(CURDATE(),'%Y%m%d')
-            AND HOUR(HORA_DAT) = HOUR(CURTIME())";
-consulta($hora_min);
-$dato = unicaFila();
-$hora_min = $dato["HORA"];
+            /*AND HOUR(HORA_DAT) = HOUR(CURTIME())*/
+            ORDER BY HORA DESC LIMIT 60";
+$dato = consultarVariasFilas($hora_min);
+if (count($dato) <= 59) {
+    $hora_min = $dato[count($dato) - 1]["HORA"];
+} else {
+    $hora_min = $dato[59]["HORA"];
+}
 
 /**
  * Hora maxima para graficar el punto de las lineas de los limites
@@ -24,8 +31,7 @@ $hora_min = $dato["HORA"];
 $hora_max = "SELECT MAX((UNIX_TIMESTAMP(CONCAT(FECHA_DAT,' ',HORA_DAT))*1000)-(5*60*60*1000)) AS HORA
             FROM DATOS
             WHERE ID_SEN LIKE '$mod%'
-            AND ID_DAT_PAR=DATE_FORMAT(CURDATE(),'%Y%m%d')
-            AND HOUR(HORA_DAT) = HOUR(CURTIME())";
+            AND ID_DAT_PAR=DATE_FORMAT(CURDATE(),'%Y%m%d')";
 consulta($hora_max);
 $dato = unicaFila();
 $hora_max = $dato["HORA"];
@@ -50,14 +56,14 @@ $temp_max = $dato["MAX"];
 
 $salida = "[";
 
-$lim = "{\"label\": \"TMIN\",\"data\":[[$hora_max,$temp_min],[$hora_min,$temp_min]]},";
+$lim = "{\"label\": \"TMIN\",\"data\":[[$hora_max,$temp_min],[$hora_min,$temp_min],[$hora_min," . ($temp_min - 5) . "]]},";
 $salida .= $lim;
 
 /**
  * Permite obtener que sensores de ese modulo estan reportando ahora para hacer
  * la grafica solo de ellos.
  */
-$sql = "SELECT D.ID_SEN
+$sql = "SELECT D.ID_SEN, S.NOMBRE_SEN
         FROM DATOS D, SENSORES S
         WHERE ID_DAT_PAR=DATE_FORMAT(CURDATE(),'%Y%m%d')
         AND HOUR(HORA_DAT) = HOUR(CURTIME())
@@ -73,12 +79,12 @@ if (count($sensores) != 0) {
             FROM DATOS
             WHERE ID_SEN = '" . $sensor["ID_SEN"] . "'
                 AND ID_DAT_PAR=DATE_FORMAT(CURDATE(),'%Y%m%d')
-                AND HOUR(HORA_DAT) = HOUR(CURTIME())
-            ORDER BY HORA DESC ";//LIMIT 60
+                /*AND HOUR(HORA_DAT) = HOUR(CURTIME())*/
+            ORDER BY HORA DESC LIMIT 60"; //LIMIT 60
 
         $resulset = consultarVariasFilas($consultaSql);
         if (count($resulset) > 0) {
-            $salida .= "{\"label\": \"" . $sensor["ID_SEN"] . "\",\"data\": [";
+            $salida .= "{\"label\": \"" . $sensor["NOMBRE_SEN"] . "\",\"data\": [";
             for ($j = 0; $j < count($resulset); $j++) {
                 $fila = $resulset[$j];
                 $salida .= "[" . $fila["HORA"] . "," . $fila["PARAMETRO_DAT"] . "]";
@@ -90,7 +96,7 @@ if (count($sensores) != 0) {
             $salida .="]}";
 
             if ($i == count($sensores) - 1) {
-                $lim = ",{\"label\": \"TMAX\",\"data\":[[$hora_max,$temp_max],[$hora_min,$temp_max]]}";
+                $lim = ",{\"label\": \"TMAX\",\"data\":[[$hora_max,$temp_max],[$hora_min,$temp_max],[$hora_min," . ($temp_max + 5) . "]]}";
                 $salida .= $lim;
                 $salida .="]";
             } else {
