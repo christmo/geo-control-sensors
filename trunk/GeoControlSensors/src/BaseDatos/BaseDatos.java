@@ -367,7 +367,11 @@ public class BaseDatos {
             String sql = "SELECT NOMBRE_MOD FROM MODULOS WHERE MODULO_SEN='" + modulo + "'";
             return ejecutarConsultaUnDato(sql).getString("NOMBRE_MOD");
         } catch (SQLException ex) {
-            log.trace("COD[{}]", ex.getErrorCode(), ex);
+            if (ex.getErrorCode() == 0) {
+                log.trace("No se ha ingresado los nombres de los módulos...", ex);
+            } else {
+                log.trace("COD[{}]", ex.getErrorCode(), ex);
+            }
         } catch (NumberFormatException ex) {
             log.trace("{}", ex.getMessage(), ex);
         } catch (NullPointerException ex) {
