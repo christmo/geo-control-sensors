@@ -58,16 +58,16 @@ public class Monitoreo extends Thread {
 
     @Override
     public void run() {
-        boolean r = false;
-        double a, b;
+        boolean isLanzarAlerta = false;
+        double parametro_min, parametro_max;
         for (Sensor s : listaParMaxMinModulo) {
             if (s.getId_sen().equals(id_sen)) {
-                r = bd.esTiempoNuevaAlerta(id_sen);
-                a = s.getParam_min();
-                b = s.getParam_max();
-                System.out.println(r + " " + a + " " + param_sen + " " + b + " " + id_sen + " " + Utilitarios.getHora());
-                if ((param_sen < a || param_sen > b) && r) {
-                    System.err.println("Enviar: " + id_sen + " " + param_sen + " " + r + " " + Utilitarios.getHora());
+                isLanzarAlerta = bd.esTiempoNuevaAlerta(id_sen);
+                parametro_min = s.getParam_min();
+                parametro_max = s.getParam_max();
+                System.out.println(isLanzarAlerta + " " + parametro_min + " " + param_sen + " " + parametro_max + " " + id_sen + " " + Utilitarios.getHora());
+                if ((param_sen < parametro_min || param_sen > parametro_max) && isLanzarAlerta) {
+                    System.err.println("Enviar: " + id_sen + " " + param_sen + " " + isLanzarAlerta + " " + Utilitarios.getHora());
                     lanzarAlerta(s.getParam_min(), s.getParam_max(), s.getTipoSensor());
                 }
                 break;
