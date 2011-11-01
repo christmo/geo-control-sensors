@@ -176,6 +176,34 @@ public class BaseDatos {
         }
         return rsCUD;
     }
+    
+        /**
+     * Ejecuta una consulta en la base de datos, que devuelve valores
+     * no es necesario recorrer el resultset
+     * @param sql - debe ser Select
+     * @return ResultSet
+     */
+    public ResultSet ejecutarConsultaUnDatoSinImprimir(String sql) {
+        ResultSet rsCUD = null;
+        try {
+            Statement sta = (Statement) conexion.createStatement();
+            rsCUD = sta.executeQuery(sql);
+            rsCUD.next();
+        } catch (SQLException ex) {
+            int intCode = ex.getErrorCode();
+            if (intCode == 0) {
+                log.trace("Error de comunicación con la BD, mucho tiempo esperando respuesta...");
+                reconectarBaseDatos();
+            } else if (intCode == 1146) {//tabla no existe
+                log.trace("Tabla no existe: {}", ex.getMessage());
+            } else {
+                log.trace("Error al consultar codigo[" + intCode + "]", ex);
+            }
+        } catch (NullPointerException npx) {
+            log.info("No se puede aceceder a la base de datos...");
+        }
+        return rsCUD;
+    }
 
     /**
      * Ejecuta una sentencia en la base esta puede ser de INSERT, UPDATE O
@@ -389,7 +417,7 @@ public class BaseDatos {
     public String getValorConfiguracion(String key) {
         try {
             String sql = "SELECT VALOR FROM CONFIGURACION WHERE NOMBRE='" + key + "'";
-            ResultSet rsConfig = ejecutarConsultaUnDato(sql);
+            ResultSet rsConfig = ejecutarConsultaUnDatoSinImprimir(sql);
             return rsConfig.getString("VALOR");
         } catch (SQLException ex) {
             if (ex.getErrorCode() == 0) {

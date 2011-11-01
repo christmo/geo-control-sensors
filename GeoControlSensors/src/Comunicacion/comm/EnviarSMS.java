@@ -28,21 +28,21 @@ public class EnviarSMS extends Thread {
         while (true) {
             if (listaMensajes.size() > 0) {
                 for (SMS sms : listaMensajes) {
-//                    GUI_Server.comm.enviarDatos(sms.getCmd());
+                    GUI_Server.comm.enviarDatos(sms.getCmd());
                     log.trace(sms.getCmd());
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException ex) {
                         log.trace("Hilo interrumpido...");
                     }
-                    //GUI_Server.comm.enviarDatos(sms.getMensaje());
+                    GUI_Server.comm.enviarDatos(sms.getMensaje());
                     log.trace(sms.getMensaje());
                     try {
                         Thread.sleep(2000);
                     } catch (InterruptedException ex) {
                        log.trace("Hilo interrumpido...");
                     }
-                    //GUI_Server.comm.enviarDatos("AT\r\n");
+                    GUI_Server.comm.enviarDatos("AT\r\n");
                     log.trace("AT\r\n");
                     try {
                         Thread.sleep(100);
