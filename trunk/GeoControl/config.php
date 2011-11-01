@@ -105,8 +105,9 @@ require_once('php/login/isLogin.php');
             </form>
             <br/>
 
-            <div id="tabla"></div>
-
+            <div id="modulo">
+                <div id="tabla"></div>
+            </div>
         </div>
 
     </body>

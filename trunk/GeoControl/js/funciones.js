@@ -1,5 +1,9 @@
-var updateInterval = 10000;
+var updateInterval = 5000;
 
+/**
+ * Opciones de configuración generales del grafico de FLOT para la presentacion
+ * de los puntos
+ */
 var options = {
     series: {
         lines: {
@@ -18,8 +22,9 @@ var options = {
         hoverable: true
     },
     yaxis: {
-        min: 0,
-        max: 50
+        /*min: 0,
+        max: 50*/
+        autoscaleMargin: null
     },
     xaxis: {
         mode: "time",
@@ -27,6 +32,10 @@ var options = {
     }
 };
 
+/**
+ * Convierte cada una de las hora en el formato que se necesita para que se
+ * presente en el tooltip de flot
+ */
 function convertirHora(x,y,sensor,numHora,temp){
     $.ajax({
         url: 'php/timestamp.php',
@@ -38,7 +47,10 @@ function convertirHora(x,y,sensor,numHora,temp){
     });
 }
 
-
+/**
+ * Muestra el ToolTip dentro de la grafica al poner el mouse en cada punto
+ * medido por los sensores
+ */
 function showTooltip(x, y, contents) {
     $('<div id="tooltip">' + contents + '</div>').css( {
         position: 'absolute',
@@ -53,6 +65,9 @@ function showTooltip(x, y, contents) {
     }).appendTo("body").fadeIn(200);
 }
 
+/**
+ * Calendario de la interfaz para escoger una fecha
+ */
 $(function() {
     $('#datepicker').datepicker();
     $('#datepicker').datepicker("option", "dateFormat", 'yy-mm-dd');
@@ -68,6 +83,9 @@ $(function() {
     });
 });
 
+/**
+ * Comprueba si el formato es valido de la hora que se seleccione
+ */
 function compararHoras(sHora1, sHora2) {
 
     var arHora1 = sHora1.split(":");
@@ -91,6 +109,10 @@ function compararHoras(sHora1, sHora2) {
     }
 }
 
+/**
+ * Guardar los datos de temperatura max y min de todo un modulo para a partir
+ * de estos valores generar las alertas
+ */
 function guardar(mod){
     var id_max = "#"+mod+"MAX";
     var id_min = "#"+mod+"MIN";

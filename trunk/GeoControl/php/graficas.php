@@ -1,13 +1,14 @@
 <?php
 
 require_once('../dll/conect.php');
-$sql = "SELECT MODULO_SEN
-                FROM SENSORES S, DATOS D
-                WHERE S.ID_SEN = D.ID_SEN
-                AND ID_DAT_PAR=DATE_FORMAT(CURDATE(),'%Y%m%d')
-                AND HOUR(HORA_DAT) = HOUR(CURTIME())
-                GROUP BY MODULO_SEN
-                HAVING COUNT(*)>0";
+$sql = "SELECT S.MODULO_SEN, M.NOMBRE_MOD
+        FROM SENSORES S, DATOS D, MODULOS M
+        WHERE S.ID_SEN = D.ID_SEN
+        AND M.MODULO_SEN = S.MODULO_SEN
+        AND ID_DAT_PAR=DATE_FORMAT(CURDATE(),'%Y%m%d')
+        AND HOUR(HORA_DAT) = HOUR(CURTIME())
+        GROUP BY S.MODULO_SEN
+        HAVING COUNT(*)>0";
 
 $result = consultarVariasFilas($sql);
 
@@ -16,7 +17,7 @@ if ($result > 0) {
         $fila = $result[$i];
 
         echo "<div id=\"modulo\">";
-        echo "<b>Modulo: </b>" . $fila["MODULO_SEN"] . "<br/>";
+        echo "<b>Modulo: </b>" . $fila["NOMBRE_MOD"] . "<br/>";
         echo "<div id=\"placeholder$i\" class=\"grafico\"></div>";
         echo "</div>";
 

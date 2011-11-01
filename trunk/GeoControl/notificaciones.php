@@ -50,7 +50,7 @@ require_once('php/login/isLogin.php');
         $result = consultarVariasFilas($sql);
 
         echo "<div id=\"modulo\">";
-        echo "<h2>Reporte de Hist&oacute;rico de Mediciones:</h2>";
+        echo "<h2>Reporte de Notificaciones:</h2>";
         echo "<div class=\"ui-widget\">";
         echo "Fecha a consultar: <input type=\"text\" id=\"datepicker\" class=\"fecha\"/> ";
         echo "Hora Inicio:  <input id=\"horaini\" type=\"text\" value=\"00:00\" class=\"tiempo\"> ";
@@ -62,60 +62,35 @@ require_once('php/login/isLogin.php');
             echo "<option value=\"" . $fila["MODULO_SEN"] . "\">" . $fila["NOMBRE_MOD"] . "</option>";
         }
         echo "</select><br/>";
-        echo "<button id='boton' onclick=\"update()\">Buscar</button>";
+        echo "<button id='boton' onclick=\"buscarNotificaciones()\">Buscar</button>";
         echo "</div>";
 
-        echo "<div id=\"grafconsulta\" class=\"grafico\"></div>";
-        echo "</div>";
+        echo "<div id=\"tabla\"></div>";
+
+        /*  echo "<div id=\"grafconsulta\" class=\"grafico\"></div>";
+          echo "</div>"; */
         echo "<script type=\"text/javascript\">
-              var previousPoint = null;
-              $(\"#grafconsulta\").bind(\"plothover\", function (event, pos, item) {
-                  if (item) {
-                      if (previousPoint != item.dataIndex) {
-                          previousPoint = item.dataIndex;
-                          $(\"#tooltip\").remove();
-                          var horaTimeStamp = item.datapoint[0].toFixed(2),
-                          temp = item.datapoint[1].toFixed(2);
-                          convertirHora(
-                              item.pageX,
-                              item.pageY,
-                              item.series.label,
-                              horaTimeStamp,
-                              temp
-                         );
-                      }
-                  }else {
-                          $(\"#tooltip\").remove();
-                          previousPoint = null;
-                  }
-              });
-
-            var placeholder = $('#grafconsulta');
-
-            function onDataReceived(series) {
-                $.plot(placeholder, series, options);
-            }
-
-            function update() {
+         function buscarNotificaciones() {
                 var mod = $('#combobox').val();
                 var fec = $('#datepicker').val();
                 var ini = $('#horaini').val();
                 var fin = $('#horafin').val();
+                //alert(compararHoras(ini,fin));
                 if(compararHoras(ini,fin)){
-                    $.ajax({
-                        url: 'php/getDatosConsulta.php',
+                    /*$.ajax({
+                        url: 'php/tablaNotificaciones.php',
                         method: 'GET',
                         data: 'mod='+mod+'&'+'fecha='+fec+'&'+'hora_ini='+ini+'&'+'hora_fin='+fin,
                         dataType: 'json',
                         success: onDataReceived
-                    });
+                    });*/
+                     $('#tabla').load(\"php/tablaNotificaciones.php?\"+'modulo='+mod+'&'+'fecha='+fec+'&'+'hora_ini='+ini+'&'+'hora_fin='+fin);
                 }else{
                     alert('La hora de inicio debe ser menor a la de fin...');
                 }
             }
 
-        </script>";
-
+          </script>";
         echo "<script type=\"text/javascript\">
             $(function() {
             $('#horafin').timepicker('setDate', (new Date()));

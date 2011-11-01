@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Se utiliza para sacar los ultimos puntos de un modulo, dentro de la hora en
  * la que se encuentra la maquina
@@ -50,14 +51,14 @@ $temp_max = $dato["MAX"];
 
 $salida = "[";
 
-$lim = "{\"label\": \"TMIN\",\"data\":[[$hora_max,$temp_min],[$hora_min,$temp_min]]},";
+$lim = "{\"label\": \"TMIN\",\"data\":[[$hora_max,$temp_min],[$hora_min,$temp_min],[$hora_min," . ($temp_min - 5) . "]]},";
 $salida .= $lim;
 
 /**
  * Permite obtener que sensores de ese modulo estan reportando ahora para hacer
  * la grafica solo de ellos.
  */
-$sql = "SELECT D.ID_SEN
+$sql = "SELECT D.ID_SEN, S.NOMBRE_SEN
         FROM DATOS D, SENSORES S
         WHERE ID_DAT_PAR=DATE_FORMAT('$fecha','%Y%m%d')
         AND HORA_DAT BETWEEN '$hora_ini' AND '$hora_fin'
@@ -74,11 +75,11 @@ if (count($sensores) != 0) {
             WHERE ID_SEN = '" . $sensor["ID_SEN"] . "'
             AND ID_DAT_PAR=DATE_FORMAT('$fecha','%Y%m%d')
             AND HORA_DAT BETWEEN '$hora_ini' AND '$hora_fin'
-            ORDER BY HORA DESC ";//LIMIT 60
+            ORDER BY HORA DESC "; //LIMIT 60
 
         $resulset = consultarVariasFilas($consultaSql);
         if (count($resulset) > 0) {
-            $salida .= "{\"label\": \"" . $sensor["ID_SEN"] . "\",\"data\": [";
+            $salida .= "{\"label\": \"" . $sensor["NOMBRE_SEN"] . "\",\"data\": [";
             for ($j = 0; $j < count($resulset); $j++) {
                 $fila = $resulset[$j];
                 $salida .= "[" . $fila["HORA"] . "," . $fila["PARAMETRO_DAT"] . "]";
@@ -90,7 +91,7 @@ if (count($sensores) != 0) {
             $salida .="]}";
 
             if ($i == count($sensores) - 1) {
-                $lim = ",{\"label\": \"TMAX\",\"data\":[[$hora_max,$temp_max],[$hora_min,$temp_max]]}";
+                $lim = ",{\"label\": \"TMAX\",\"data\":[[$hora_max,$temp_max],[$hora_min,$temp_max],[$hora_min," . ($temp_max + 5) . "]]}";
                 $salida .= $lim;
                 $salida .="]";
             } else {
