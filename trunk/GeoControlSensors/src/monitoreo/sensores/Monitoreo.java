@@ -112,7 +112,9 @@ public class Monitoreo extends Thread {
                             + "\nFECHA:" + Utilitarios.getFechaAAAAMMddSlash()
                             + "\nHORA:" + Utilitarios.getHora();
 
-                    EnviarSMS.listaMensajes.add(new SMS(mensaje, contacto.getStrNumero()));
+                    if (!contacto.getStrNumero().equals("") || contacto.getStrNumero() != null) {
+                        EnviarSMS.listaMensajes.add(new SMS(mensaje, contacto.getStrNumero()));
+                    }
                 }
             } catch (NullPointerException ex) {
                 log.trace("No está la directiva para enviar SMS en la base de datos...");

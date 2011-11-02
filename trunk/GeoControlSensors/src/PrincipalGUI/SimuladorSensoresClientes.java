@@ -42,7 +42,7 @@ public class SimuladorSensoresClientes {
                 System.out.print("" + demo);
                 ou.write(demo.getBytes());
                 try {
-                    Thread.sleep(1000 * 30);
+                    Thread.sleep(1000 * 1);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(SimuladorSensoresClientes.class.getName()).log(Level.SEVERE, null, ex);
                 }
