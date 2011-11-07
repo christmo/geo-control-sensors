@@ -101,7 +101,7 @@
         <SMTPPort>465</SMTPPort>
         <SSL>true</SSL>
         <Username>soporte@kradac.com</Username>
-        <Password>kradacloja</Password>
+        <Password></Password>
 
         <To>soporte@kradac.com</To>
         <From>soporte@kradac.com</From>
