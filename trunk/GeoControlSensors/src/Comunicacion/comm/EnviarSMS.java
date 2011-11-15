@@ -60,7 +60,7 @@ public class EnviarSMS extends Thread {
                         }
                     }
                     listaMensajes.clear();
-                    GUI_Server.comm.enviarDatos("AT$RESET\r\n");
+                    GUI_Server.comm.enviarDatos("AT+CFUN=1\r\n");
                     try {
                         Thread.sleep(10000);
                     } catch (InterruptedException ex) {
