@@ -281,7 +281,7 @@ public class CommMensajes extends Thread {
 
         try {
             os = sPuerto.getOutputStream();
-            //System.out.println("Enviar: " + mensaje);
+            System.out.println("[COM]" + mensaje);
             os.write(mensaje.getBytes());
         } catch (IOException ex) {
             log.trace("Error al anviar datos...", ex);
