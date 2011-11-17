@@ -46,6 +46,18 @@ $dato = unicaFila();
 $temp_min = $dato["MIN"];
 
 /**
+ * Margen INFERIOR para que la grafia no quede pegada al borde, calculada a partir del
+ * valor guardado mal alto + un numero en este caso 5
+ */
+$margen_min = "SELECT MIN(parametro_dat)-($temp_min)-5 AS MARGEN
+                FROM DATOS
+                WHERE id_dat_par=date_format(CURDATE(),'%Y%m%d')";
+consulta($margen_min);
+$dato = unicaFila();
+$margen_min = $dato["MARGEN"];
+
+
+/**
  * Temperatura maxima para graficar las lineas de los limites
  */
 $temp_max = "SELECT AVG(PAR_MAX_SEN) AS MAX FROM sensores
@@ -54,9 +66,28 @@ consulta($temp_max);
 $dato = unicaFila();
 $temp_max = $dato["MAX"];
 
+/**
+ * Margen SUPERIOR para que la grafia no quede pegada al borde, calculada a partir del
+ * valor guardado mal alto + un numero en este caso 5
+ */
+/*$margen_max = "SELECT MAX(parametro_dat)-($temp_max)+5 AS MARGEN
+                FROM DATOS
+                WHERE id_dat_par=date_format(CURDATE(),'%Y%m%d')";*/
+$margen_max = "SELECT ROUND(MAX(parametro_dat)-($temp_max)+7) AS MARGEN
+               FROM(
+                SELECT PARAMETRO_DAT
+                FROM DATOS
+                WHERE FECHA_DAT = date_format(CURDATE(),'%Y%m%d')
+                ORDER BY HORA_DAT DESC LIMIT 100
+               ) AS ULTIMOS_DATOS";
+consulta($margen_max);
+$dato = unicaFila();
+$margen_max = $dato["MARGEN"];
+
+
 $salida = "[";
 
-$lim = "{\"label\": \"TMIN\",\"data\":[[$hora_max,$temp_min],[$hora_min,$temp_min],[$hora_min," . ($temp_min - 5) . "]]},";
+$lim = "{\"label\": \"TMIN\",\"data\":[[$hora_max,$temp_min],[$hora_min,$temp_min],[$hora_min," . ($temp_min + $margen_min) . "]]},";
 $salida .= $lim;
 
 /**
@@ -96,7 +127,7 @@ if (count($sensores) != 0) {
             $salida .="]}";
 
             if ($i == count($sensores) - 1) {
-                $lim = ",{\"label\": \"TMAX\",\"data\":[[$hora_max,$temp_max],[$hora_min,$temp_max],[$hora_min," . ($temp_max + 5) . "]]}";
+                $lim = ",{\"label\": \"TMAX\",\"data\":[[$hora_max,$temp_max],[$hora_min,$temp_max],[$hora_min," . ($temp_max + $margen_max) . "]]}";
                 $salida .= $lim;
                 $salida .="]";
             } else {
