@@ -32,7 +32,7 @@ for ($i = 0; $i < count($result); $i++) {
     $fila = $result[$i];
     echo "<tr>";
     echo "<td class=\"tdNombre\">";
-    echo $fila["NOMBRE_CON"];
+    echo utf8_encode($fila["NOMBRE_CON"]);
     echo "</td>";
     echo "<td class=\"tdCorreo\">";
     echo $fila["MAIL_CON"];

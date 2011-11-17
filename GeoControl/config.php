@@ -24,7 +24,7 @@ require_once('php/login/isLogin.php');
         <script type="text/javascript">
             function addTableRow(){
                 var nombre = $('#txtNombre').val();
-                nombre = nombre.replace(/\s/g,"%20");
+                nombre = nombre.replace(/\s/g,"%20");           
                 var mail = $('#txtMail').val();
                 var tel = $('#txtTelefono').val();
 

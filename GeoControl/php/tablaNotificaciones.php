@@ -36,7 +36,7 @@ for ($i = 0; $i < count($result); $i++) {
     echo $fila["HORA"];
     echo "</td>";
     echo "<td class=\"tdNombre\">";
-    echo $fila["CONTACT"];
+    echo utf8_encode($fila["CONTACT"]);
     echo "</td>";
     echo "<td class=\"tdPar\">";
     echo $fila["PARAM"];
