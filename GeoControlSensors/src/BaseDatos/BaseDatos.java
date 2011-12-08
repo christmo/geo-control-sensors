@@ -417,7 +417,7 @@ public class BaseDatos {
     public String getValorConfiguracion(String key) {
         try {
             String sql = "SELECT VALOR FROM CONFIGURACION WHERE NOMBRE='" + key + "'";
-            ResultSet rsConfig = ejecutarConsultaUnDatoSinImprimir(sql);
+            ResultSet rsConfig = ejecutarConsultaUnDato(sql);
             return rsConfig.getString("VALOR");
         } catch (SQLException ex) {
             if (ex.getErrorCode() == 0) {
