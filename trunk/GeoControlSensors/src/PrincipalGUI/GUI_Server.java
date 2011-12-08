@@ -94,6 +94,20 @@ public class GUI_Server extends javax.swing.JFrame {
                 comm.start();
 
                 comm.enviarDatos("AT\r\n");
+                System.out.println("AT\r\n");
+                 try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        log.trace("Hilo interrumpido...");
+                    }
+
+                GUI_Server.comm.enviarDatos("AT+CFUN=1\r\n");
+                System.out.println("AT+CFUN=1\r\n");
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException ex) {
+                        log.trace("Hilo interrumpido...");
+                    }
             }
         } catch (NullPointerException ex) {
             JOptionPane.showMessageDialog(null, "No esta configurado el COMM en la BD", "Error...", 0);
