@@ -131,7 +131,7 @@ public class GUI_Server extends javax.swing.JFrame {
         setTitle("Geo Control Sensors");
         setResizable(false);
 
-        btnIniciar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/velocidad.png"))); // NOI18N
+        btnIniciar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/temperatura.png"))); // NOI18N
         btnIniciar.setToolTipText("Iniciar servidor...");
         btnIniciar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
