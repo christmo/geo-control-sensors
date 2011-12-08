@@ -38,7 +38,7 @@ public class SimuladorSensoresClientes {
             while (true) {
                 //demo = "M01%T1&" + (int)(Math.random() * 30) + "%T2&" + (int)(Math.random() * 30) + "%T3&" + (int)(Math.random() * 30) + "%T4&" + (int)(Math.random() * 30)+"\n";
                 //demo = "M01%T1&" + (int) (Math.random() * 30) + "%T2&" + (int) (Math.random() * 30) + "\n";
-                demo = "M01%T1&" + (Math.random() * 100)+ "\n";
+                demo = "M01%T2&" + (Math.random() * 30)+ "\n";
                 System.out.print("" + demo);
                 ou.write(demo.getBytes());
                 try {
