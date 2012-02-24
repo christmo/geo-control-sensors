@@ -11,12 +11,9 @@ extract($_GET);
  * Hora minima para graficar el punto de las lineas de los limites
  */
 $hora_min = "SELECT ((UNIX_TIMESTAMP(CONCAT(FECHA_DAT,' ',HORA_DAT))*1000)-(5*60*60*1000)) AS HORA
-            /*SELECT MIN((UNIX_TIMESTAMP(CONCAT(FECHA_DAT,' ',HORA_DAT))*1000)-(5*60*60*1000)) AS HORA*/
             FROM DATOS
-            /*WHERE ID_SEN LIKE '$mod%'*/
             WHERE ID_SEN = '" . $mod . "T1'
             AND ID_DAT_PAR=DATE_FORMAT(CURDATE(),'%Y%m%d')
-            /*AND HOUR(HORA_DAT) = HOUR(CURTIME())*/
             ORDER BY HORA DESC LIMIT 60";
 $dato = consultarVariasFilas($hora_min);
 if (count($dato) <= 59) {
@@ -110,7 +107,6 @@ if (count($sensores) != 0) {
             FROM DATOS
             WHERE ID_SEN = '" . $sensor["ID_SEN"] . "'
                 AND ID_DAT_PAR=DATE_FORMAT(CURDATE(),'%Y%m%d')
-                /*AND HOUR(HORA_DAT) = HOUR(CURTIME())*/
             ORDER BY HORA DESC LIMIT 60"; //LIMIT 60
 
         $resulset = consultarVariasFilas($consultaSql);
